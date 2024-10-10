@@ -34,7 +34,7 @@ try {
 
     $result = $db->prepare($query);
     $result->execute();
-    $reporte = $result->fetchAll(PDO::FETCH_ASSOC); // Obtener todos los resultados como array asociativo
+    $reporte = $result->fetchAll(PDO::FETCH_ASSOC); 
 } catch (Exception $e) {
     echo "Ocurrió un error: " . $e->getMessage();
     exit();
@@ -47,24 +47,29 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Estudiantes Vigentes</title>
+    <link rel="stylesheet" href="../styles/mystyle.css">
 </head>
-<body>
-    <h1>Reporte de Estudiantes Vigentes</h1>
+<body class="user"> 
+    <h1 class="title">Reporte de Estudiantes Vigentes</h1>
 
-    <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse; width: 50%;">
-        <tr>
-            <th>Estado Nivel</th>
-            <th>Cantidad</th>
-        </tr>
-        <?php foreach ($reporte as $fila): ?>
+    <table class="styled-table"> 
+        <thead>
             <tr>
-                <td><?php echo htmlspecialchars($fila['estado_nivel']); ?></td>
-                <td><?php echo htmlspecialchars($fila['cantidad']); ?></td>
+                <th>Estado Nivel</th>
+                <th>Cantidad</th>
             </tr>
-        <?php endforeach; ?>
+        </thead>
+        <tbody>
+            <?php foreach ($reporte as $fila): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($fila['estado_nivel']); ?></td>
+                    <td><?php echo htmlspecialchars($fila['cantidad']); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
     </table>
 
     <br>
-    <a href="../user.php">Volver a consultas</a>
+    <a href="../user.php" class="form-button">Volver a consultas</a> 
 </body>
 </html>
