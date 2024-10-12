@@ -2,16 +2,22 @@
 require "utils.php";
 
 // Parte 1: Abrir archivo 1
-$ruta = "data/estudiantes.csv";
+$ruta_estudiantes = "data/estudiantes.csv";
+$ruta_asignaturas = "data/asignaturas.csv";
+$ruta_planes = "data/planes.csv";
+$ruta_prerrequisitos = "data/prerequisitos.csv";
 
 function abrir_archivo($ruta) {
-    $archivo_datos_1 = fopen($ruta, "r"); //Abrir archivo en modo lectura
+    $archivo_datos_1 = fopen($ruta, "r"); // Abrir archivo en modo lectura
     $array_datos_1 = [];
     while (!feof($archivo_datos_1)) {
         $linea = fgets($archivo_datos_1);
-        $array_datos_1[] = explode(";", $linea);
+        $linea = rtrim($linea); // Elimina el salto de línea y espacios en blanco al final
+        if (!empty($linea)) { // Verifica que la línea no esté vacía
+            $array_datos_1[] = explode(";", $linea);
+        }
     }
-    fclose($archivo_datos_1); 
+    fclose($archivo_datos_1);
     return $array_datos_1;
 }
 
@@ -61,55 +67,66 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
                 $ruts_vistos[] = $rut; // Guardar el RUT visto
             }
         } else {
+            echo "Error: rut inválido\n";
             $es_valido = false;
         }
 
         // Validar Cohorte (en formato YYYY-01 o YYYY-02)
         if (isset($linea[2]) && !empty($linea[2]) && !preg_match('/^\d{4}-(01|02)$/', $linea[2])) {
+            echo "Error: Cohorte inválido\n", $linea[2];
             $es_valido = false;
         }
 
         // Validar Número de Estudiante (6 dígitos)
         if (isset($linea[3]) && !empty($linea[3]) && !preg_match('/^\d{6}$/', $linea[3])) {
+            echo "Error: num inválido\n";
             $es_valido = false;
         }
 
         // Validar Bloqueo (S o N)
         if (isset($linea[4]) && !empty($linea[4]) && !preg_match('/^[NS]$/', $linea[4])) {
+            echo "Error: bloqueo inválido\n";
             $es_valido = false;
         }
 
         // Validar DV (un solo dígito o 'K')
         if (isset($linea[7]) && !empty($linea[7]) && !preg_match('/^[0-9K]$/', $linea[7])) {
+            echo "Error: dv inválido\n";
             $es_valido = false;
         }
 
         // Validar y corregir Nombres (solo letras y espacios, no nulo)
         if (!isset($linea[8]) || empty($linea[8]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $linea[8])) {
+            echo "Error: nombre1 inválido\n";
             $es_valido = false;
         }
         // Validar y corregir Nombres (solo letras y espacios, no nulo)
         if (!isset($linea[9]) || empty($linea[9]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $linea[9])) {
+            echo "Error: nombre 2 inválido\n";
             $es_valido = false;
         }
 
         // Validar y corregir Apellido Paterno (solo letras y espacios, no nulo)
-        if (!isset($linea[10]) || empty($linea[10]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $linea[10])) {
+        if (!isset($linea[10]) || empty($linea[10]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/u', $linea[10])) {
+            echo "Error: paterno inválido\n";
             $es_valido = false;
         }
 
         // Validar Apellido Materno (solo letras y espacios, puede ser nulo)
-        if (!isset($linea[11]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/u', $linea[11])) {
+        if (!isset($linea[11]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/u', $linea[11])) {
+            echo "Error: materno inválido\n";
             $es_valido = false;
         }
 
         // Validar Fecha Último Logro (formato YYYY-MM-DD)
         if (!isset($linea[13]) || empty($linea[13]) || !preg_match('/^\d{4}-(01|02)$/', $linea[13])) {
+            echo "Error: logro inválido\n";
             $es_valido = false;
         }
 
-        // Validar Fecha Última Carga (formato YYYY-MM-DD)
+        // Validar Fecha Última Carga (formato YYYY-MM)
         if (!isset($linea[14]) || empty($linea[14]) || !preg_match('/^\d{4}-(01|02)$/', $linea[14])) {
+            echo "Error: carga inválido\n", $linea[14];
             $es_valido = false;
         }
 
@@ -182,13 +199,13 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
                 $linea_corregida[9] = trim($linea[9]);
             }
 
-            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/u', trim($linea[10]))) {
+            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/u', trim($linea[10]))) {
                 $linea_corregida[10] = 'x';
             } else {
                 $linea_corregida[10] = trim($linea[10]);
             }
 
-            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]*$/u', trim($linea[11]))) {
+            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/u', trim($linea[11]))) {
                 $linea_corregida[11] = 'x';
             } else {
                 $linea_corregida[11] = trim($linea[11]);
@@ -210,8 +227,261 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
     return $array_validos;
 }
 
+function validar_y_corregir_datos_asignaturas($array_datos, $nombre_archivo_errores, $nombre_archivo_corregidos) {
+    $array_validos = [];
+    $array_errores = [];
+    $array_corregidos = [];
 
-// Función para guardar los datos en un archivo CSV
+    foreach ($array_datos as $linea) {
+        $es_valido = true;
+
+        // Plan debe ser dos letras seguidas de uno o más dígitos (ej. 'AA1', 'BB12', etc.)
+        if (isset($linea[0]) && !empty($linea[0]) && !preg_match('/^[A-Za-z]{2}\d+$/', $linea[0])) {
+            echo "Error: plan inválido\n", $linea[0];
+            $es_valido = false;
+        }
+
+        // Asignatura_id debe ser dos letras seguidas de uno o más dígitos (ej. 'AA1', 'BB123', etc.)
+        if (isset($linea[1]) && !empty($linea[1]) && !preg_match('/^[A-Za-z]{2}\d+$/', $linea[1])) {
+            echo "Error: id inválido\n", $linea[1];
+            $es_valido = false;
+        }
+
+        // Nivel puede ser 'B', 'L' o un número del 1 al 10
+        if (isset($linea[3]) && !empty($linea[3]) && !preg_match('/^(B|L|[1-9]|10)$/', $linea[3])) {
+            echo "Error: nivel inválido\n", $linea[3];
+            $es_valido = false;
+        }
+
+        // Prerequisito debe ser 'B' o 'L'
+        if (isset($linea[4]) && !empty($linea[4]) && !preg_match('/^[BL]$/', $linea[4])) {
+            echo "prerequisito: valor inválido\n", $linea[4];
+            $es_valido = false;
+        }
+
+        // Si no es válido, guardarlo en el archivo de errores y corregir los errores
+        if (!$es_valido) {
+            $array_errores[] = $linea;
+
+            // Corregir atributos inválidos si es posible
+            $linea_corregida = $linea;
+
+            // Corregir plan si no es válido
+            if (!isset($linea[0]) || !preg_match('/^[A-Za-z]{2}\d+$/', trim($linea[0]))) {
+                $linea_corregida[0] = 'x'; // Valor por defecto para plan
+            } else {
+                $linea_corregida[0] = trim($linea[0]);
+            }
+
+            // Corregir asignatura_id si no es válido
+            if (!isset($linea[1]) || !preg_match('/^[A-Za-z]{2}\d+$/', trim($linea[1]))) {
+                $linea_corregida[1] = 'x'; // Valor por defecto para asignatura_id
+            } else {
+                $linea_corregida[1] = trim($linea[1]);
+            }
+
+            // Corregir nivel si no es válido
+            if (!isset($linea[3]) || !preg_match('/^(B|L|[1-9]|10)$/', trim($linea[3]))) {
+                $linea_corregida[3] = 'x'; // Valor por defecto para nivel
+            } else {
+                $linea_corregida[3] = trim($linea[3]);
+            }
+
+            // Corregir prerequisito si no es válido
+            if (!isset($linea[4]) || !preg_match('/^[BL]$/', trim($linea[4]))) {
+                $linea_corregida[4] = 'x'; // Valor por defecto para prerequisito
+            } else {
+                $linea_corregida[4] = trim($linea[4]);
+            }
+
+            // Agregar la línea corregida al archivo corregido
+            $array_corregidos[] = $linea_corregida;
+
+        } else {
+            // Si es válido, agregar a la lista de válidos
+            $array_validos[] = $linea;
+        }
+    }
+
+    // Guardar los errores y los corregidos en archivos CSV
+    guardar_csv($array_errores, $nombre_archivo_errores);
+    guardar_csv($array_corregidos, $nombre_archivo_corregidos);
+
+    // Retornar los datos válidos
+    return $array_validos;
+}
+
+function validar_y_corregir_datos_planes($array_datos, $nombre_archivo_errores, $nombre_archivo_corregidos) {
+    $array_validos = [];
+    $array_errores = [];
+    $array_corregidos = [];
+
+    foreach ($array_datos as $linea) {
+        $es_valido = true;
+
+        // 1. Código de Plan: Debe ser dos letras seguidas de dígitos
+        if (!preg_match('/^[A-Za-z]{2}\d+$/', $linea[0])) {
+            echo "Error: código de plan inválido\n", $linea[0];
+            $es_valido = false;
+        }
+
+        // 2. Facultad: Solo puede ser "Facultad de Magia y Hechicería" o "Ministerio de magia"
+        if (!in_array(trim($linea[1]), ['Facultad de Magia y Hechicería', 'Ministerio de magia'])) {
+            echo "Error: facultad inválida\n";
+            $es_valido = false;
+        }
+
+        // 3. Plan: Elimina lo que está en paréntesis y "PLAN Año"
+        if (isset($linea[3])) {
+            $linea[3] = preg_replace('/\(.*?\)|PLAN \d{4}/', '', trim($linea[3]));
+            $linea[3] = trim($linea[3]); // Elimina espacios sobrantes
+        }
+
+        // 4. Jornada: Debe ser "diurno" o "vespertino", sin espacios
+        $linea[4] = preg_replace('/\s+/', '', strtolower($linea[4]));
+        if (!in_array($linea[4], ['diurno', 'vespertino'])) {
+            echo "Error: jornada inválida\n";
+            $es_valido = false;
+        }
+
+        // 5. Sede: Debe ser "Uagadou", "Beauxbaton" o "Hogwarts"
+        if (!in_array(trim($linea[5]), ['Uagadou', 'Beauxbaton', 'Hogwarts'])) {
+            echo "Error: sede inválida\n";
+            $es_valido = false;
+        }
+
+        // 6. Grado: Debe ser uno de los valores válidos, convertido a mayúsculas
+        $linea[6] = strtoupper(trim($linea[6]));
+        if (!in_array($linea[6], ['PROGRAMA ESPECIAL', 'PREGRADO', 'POSTGRADO'])) {
+            echo "Error: grado inválido\n";
+            $es_valido = false;
+        }
+
+        // 7. Modalidad: Debe ser "presencial" o "online"
+        if (!in_array(trim($linea[7]), ['Presencial', 'OnLine'])) {
+            echo "Error: modalidad inválida\n";
+            $es_valido = false;
+        }
+
+        // 8. Inicio de Vigencia: Formato de fecha dd/mm/aaaa
+        if (!preg_match('/^\d{2}\/\d{2}\/\d{2}$/', $linea[8])) {
+            echo "Error: fecha de inicio de vigencia inválida\n", $linea[8];
+            $es_valido = false;
+        }
+
+        // Si la línea tiene errores, la guardamos en los errores y corregimos lo necesario
+        if (!$es_valido) {
+            $array_errores[] = $linea;
+            if (empty(implode('', $linea))) {
+                // Si la línea está completamente vacía, se guarda en el array de invalido
+                $array_invalido[] = $linea;
+                continue; // Omitir el procesamiento de esta línea
+            }
+            // Corregir los campos con valores por defecto si son inválidos
+            if (!preg_match('/^[A-Za-z]{2}\d+$/', trim($linea[0]))) {
+                $linea[0] = 'x'; // Valor por defecto para código de plan
+            }
+            if (!in_array(trim($linea[1]), ['Facultad de Magia y Hechicería', 'Ministerio de magia'])) {
+                $linea[1] = 'x'; // Valor por defecto para facultad
+            }
+            $linea[3] = preg_replace('/\(.*?\)|PLAN \d{4}/', '', trim($linea[3]));
+            $linea[3] = preg_replace('/\s+/', '', strtolower($linea[3])); // Deja en minúsculas
+
+            if (!in_array($linea[4], ['diurno', 'vespertino'])) {
+                $linea[4] = 'vespertino'; // Valor por defecto para jornada
+            }
+            if (!in_array(trim($linea[5]), ['Uagadou', 'Beauxbaton', 'Hogwarts'])) {
+                $linea[5] = 'Hogwarts'; // Valor por defecto para sede
+            }
+            if (!in_array($linea[6], ['PROGRAMA ESPECIAL', 'PREGRADO', 'POSTGRADO'])) {
+                $linea[6] = 'x'; // Valor por defecto para grado
+            }
+            if (!in_array(trim($linea[7]), ['Presencial', 'OnLine'])) {
+                $linea[7] = 'Presencial'; // Valor por defecto para modalidad
+            }
+            if (!preg_match('/^\d{2}\/\d{2}\/\d{2}$/', trim($linea[8]))) {
+                $linea[8] = 'x'; // Valor por defecto para fecha de vigencia
+            }
+            // Agregar la línea corregida a los corregidos
+            $array_corregidos[] = $linea;
+        } else {
+            // Si es válida, agregarla a los válidos
+            $array_validos[] = $linea;
+        }
+    }
+
+    // Guardar los errores y los corregidos en archivos CSV
+    guardar_csv($array_errores, $nombre_archivo_errores);
+    guardar_csv($array_corregidos, $nombre_archivo_corregidos);
+
+    // Retornar los datos válidos
+    return $array_validos;
+}
+
+// funcion para prerequisitos
+function validar_y_corregir_datos_prerrequisitos($array_datos, $nombre_archivo_errores, $nombre_archivo_corregidos) {
+    $array_validos = [];
+    $array_errores = [];
+    $array_corregidos = [];
+
+    foreach ($array_datos as $linea) {
+        $es_valido = true;
+
+        // Verificar el nivel
+        if (isset($linea[3])) {
+            $nivel = trim($linea[3]); // Asegúrate de que el índice sea correcto para el nivel
+            if (empty($nivel) || !ctype_digit($nivel)) {
+                echo "Error: nivel inválido\n";
+                $es_valido = false; // Marcamos como no válido
+            }
+        }
+
+        // Verificar prerequisitos
+        if (isset($linea[4])) {
+            $prerequisitos = trim($linea[4]); // Accedemos a los prerequisitos
+            
+            // Expresión regular para validar los prerequisitos
+            $valid_prereq_regex = '/^(ingreso|Ingreso|egreso|B|L|B v L|\d{4}|)$/'; // Permite los valores válidos y un número de 4 dígitos
+            
+            // Validación del prerequisito
+            if (!preg_match($valid_prereq_regex, $prerequisitos)) {
+                echo "Error: prerequisito inválido - $prerequisitos\n";
+                $es_valido = false; // Marcamos como no válido
+            }
+        }
+
+        // Si la línea tiene errores, la guardamos en los errores y corregimos lo necesario
+        if (!$es_valido) {
+            // Agregar la línea a errores
+
+            $array_errores[] = $linea; 
+
+            if (isset($linea[3])) {
+                $linea[3] = 'x'; // Corrección: asignar "x" si el nivel no es válido
+            }
+
+            if (isset($linea[4]) && $linea[4] === "por fijar") {
+                continue; // Saltar a la siguiente iteración
+            }
+            $array_corregidos[] = $linea;
+        } else {
+            // Si es válida, agregarla a los válidos
+            $array_validos[] = $linea;
+        }
+
+        // Siempre agregar la línea corregida a los corregidos
+         
+    }
+
+    // Guardar los errores y los corregidos en archivos CSV
+    guardar_csv($array_errores, $nombre_archivo_errores);
+    guardar_csv($array_corregidos, $nombre_archivo_corregidos);
+
+    // Retornar los datos válidos
+    return $array_validos;
+}
+
+//Función para guardar los datos en un archivo CSV
 function guardar_csv($array_datos, $nombre_archivo) {
     $archivo = fopen($nombre_archivo, 'w');
     foreach ($array_datos as $linea) {
@@ -235,14 +505,38 @@ function procesar_datos_y_insertar($ruta_archivo, $posicion_rut, $nombre_archivo
     }
 }
 
-# trabajo los datos
-$array_datos_1 = abrir_archivo($ruta);
-echo "cantidad de datos en array original", count($array_datos_1);
+// # trabajo los datos de estudiantes, funcinoa ok.
+// $array_datos_1 = abrir_archivo($ruta_estudiantes);
+// echo "cantidad de datos en array original", count($array_datos_1);
+// echo "\n";
+
+// $estudiantes_validos = validar_y_corregir_datos_estudiante($array_datos_1, 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv");
+// #imprimir_bonito($array_datos_1);
+// echo "cantidad de datos en array limpio", count($estudiantes_validos);
+
+// $array_datos_2 = abrir_archivo($ruta_asignaturas);
+// echo "cantidad de datos en array original", count($array_datos_2);
+// echo "\n";
+
+// $asignaturas_validos = validar_y_corregir_datos_asignaturas($array_datos_2, "asignaturas_invalidos.csv", "asignaturas_corregidos.csv");
+// #imprimir_bonito($array_datos_1);
+// echo "cantidad de datos en array limpio", count($asignaturas_validos);
+
+// $array_datos_3 = abrir_archivo($ruta_planes);
+// echo "cantidad de datos en array original", count($array_datos_3);
+// echo "\n";
+
+// $planes_validos = validar_y_corregir_datos_planes($array_datos_3, "planes_invalidos.csv", "planes_corregidos.csv");
+// #imprimir_bonito($array_datos_1);
+// echo "cantidad de datos en array limpio", count($planes_validos);
+
+$array_datos_4 = abrir_archivo($ruta_prerrequisitos);
+echo "cantidad de datos en array original", count($array_datos_4);
 echo "\n";
 
-$estudiantes_validos = validar_y_corregir_datos_estudiante($array_datos_1, 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv");
+$prerrequisitos_validos = validar_y_corregir_datos_prerrequisitos($array_datos_4, "prerrequisitos_invalidos.csv", "prerrequisitos_corregidos.csv");
 #imprimir_bonito($array_datos_1);
-echo "cantidad de datos en array limpio", count($estudiantes_validos);
+echo "cantidad de datos en array limpio", count($prerrequisitos_validos);
 
 // // Procesar el archivo y manejar los datos
 #procesar_datos_y_insertar("data/estudiantes.csv", 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv", $db, $estudiantes);
