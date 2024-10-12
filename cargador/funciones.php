@@ -542,5 +542,4 @@ echo "cantidad de datos en array limpio", count($prerrequisitos_validos);
 #procesar_datos_y_insertar("data/estudiantes.csv", 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv", $db, $estudiantes);
 
 
-
 ?>
