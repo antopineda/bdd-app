@@ -29,4 +29,4 @@
         echo "Error al cargar datos: " . $e->getMessage();
     }
 
-?>
+?> 

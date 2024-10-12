@@ -119,9 +119,16 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
             $es_valido = false;
         }
 
+        ## si el logro no contiene la palabra semestre, ingreso o licenciatura, ES INVALIDO
+        // Validar el logro (debe contener las palabras "semestre", "ingreso", o "licenciatura")
+        if (!isset($linea[12]) || empty($linea[12]) || !preg_match('/(semestre|ingreso|licenciatura)/i', $linea[12])) {
+            echo "Error: logro inválido\n", $linea[12];
+            $es_valido = false;
+        }
+
         // Validar Fecha Último Logro (formato YYYY-MM-DD)
         if (!isset($linea[13]) || empty($linea[13]) || !preg_match('/^\d{4}-(01|02)$/', $linea[13])) {
-            echo "Error: logro inválido\n";
+            echo "Error: fecha logro inválido\n";
             $es_valido = false;
         }
 
@@ -210,6 +217,15 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
                 $linea_corregida[11] = 'x';
             } else {
                 $linea_corregida[11] = trim($linea[11]);
+            }
+
+            $logro = $linea[12]; #es 1 ANO
+            if (preg_match('/(\d+)\s*AÑO/i', $logro, $matches)) {
+                print_r($matches);
+                $anio = (int)$matches[1];
+                $semestre_corregido = $anio * 2; // Convertir años a semestres
+                $linea_corregida[12] = $semestre_corregido . " semestre";
+                echo $linea[12];
             }
             // Agregar la línea corregida al archivo corregido
             $array_corregidos[] = $linea_corregida;
@@ -715,10 +731,6 @@ function validar_y_corregir_datos_docentes($array_datos, $nombre_archivo_errores
 
 }
 
-
-
-
-
 //Función para guardar los datos en un archivo CSV
 function guardar_csv($array_datos, $nombre_archivo) {
     $archivo = fopen($nombre_archivo, 'w');
@@ -734,7 +746,9 @@ function procesar_datos_y_insertar($ruta_archivo, $posicion_rut, $nombre_archivo
     $array_datos = abrir_archivo($ruta_archivo);
     
     // Validar y separar datos válidos de los errores
-    $datos_validos = validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombre_archivo_errores, $nombre_archivo_corregidos);
+    $estudiantes_validos = validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombre_archivo_errores, $nombre_archivo_corregidos);
+    #$notas_validas = validar_y_corregir_datos_notas();
+    
     ## aca poner las demas funciones, validar asigantura, y otros
 
     // Insertar los datos válidos en la base de datos
@@ -743,14 +757,16 @@ function procesar_datos_y_insertar($ruta_archivo, $posicion_rut, $nombre_archivo
     }
 }
 
-// # trabajo los datos de estudiantes, funcinoa ok.
-// $array_datos_1 = abrir_archivo($ruta_estudiantes);
-// echo "cantidad de datos en array original", count($array_datos_1);
-// echo "\n";
 
-// $estudiantes_validos = validar_y_corregir_datos_estudiante($array_datos_1, 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv");
-// #imprimir_bonito($array_datos_1);
-// echo "cantidad de datos en array limpio", count($estudiantes_validos);
+// # trabajo los datos de estudiantes, funcinoa ok.
+$array_datos_1 = abrir_archivo($ruta_estudiantes);
+echo "cantidad de datos en array original", count($array_datos_1);
+echo "\n";
+
+$estudiantes_validos = validar_y_corregir_datos_estudiante($array_datos_1, 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv");
+#imprimir_bonito($array_datos_1);
+echo "cantidad de datos en array limpio", count($estudiantes_validos);
+
 
 // $array_datos_2 = abrir_archivo($ruta_asignaturas);
 // echo "cantidad de datos en array original", count($array_datos_2);
@@ -776,13 +792,13 @@ function procesar_datos_y_insertar($ruta_archivo, $posicion_rut, $nombre_archivo
 // #imprimir_bonito($prerrequisitos_validos);
 // echo "cantidad de datos en array limpio", count($prerrequisitos_validos);
 
-$array_datos_5 = abrir_archivo($ruta_notas);
-echo "cantidad de datos en array original", count($array_datos_5);
-echo "\n";
+// $array_datos_5 = abrir_archivo($ruta_notas);
+// echo "cantidad de datos en array original", count($array_datos_5);
+// echo "\n";
 
-$notas_validos = validar_y_corregir_datos_notas($array_datos_5, "notas_invalidos.csv", "notas_corregidos.csv");
-#imprimir_bonito($prerrequisitos_validos);
-echo "cantidad de datos en array limpio", count($notas_validos);
+// $notas_validos = validar_y_corregir_datos_notas($array_datos_5, "notas_invalidos.csv", "notas_corregidos.csv");
+// #imprimir_bonito($prerrequisitos_validos);
+// echo "cantidad de datos en array limpio", count($notas_validos);
 
 
 // // Procesar el archivo y manejar los datos
