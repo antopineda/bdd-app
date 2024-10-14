@@ -7,6 +7,8 @@ $ruta_asignaturas = "data/asignaturas.csv";
 $ruta_planes = "data/planes.csv";
 $ruta_prerrequisitos = "data/prerequisitos.csv";
 $ruta_notas = "data/notas.csv";
+$ruta_planeacion = "data/planeacion.csv";
+$ruta_docentes = "data/docentes_planificados.csv";
 
 function abrir_archivo($ruta) {
     $archivo_datos_1 = fopen($ruta, "r"); // Abrir archivo en modo lectura
@@ -229,6 +231,7 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
             }
             // Agregar la línea corregida al archivo corregido
             $array_corregidos[] = $linea_corregida;
+            $array_validos[] = $linea_corregida;
 
         } else {
             // Si es válido, agregar a la lista de válidos
@@ -313,6 +316,7 @@ function validar_y_corregir_datos_asignaturas($array_datos, $nombre_archivo_erro
 
             // Agregar la línea corregida al archivo corregido
             $array_corregidos[] = $linea_corregida;
+            $array_validos[] = $linea_corregida;
 
         } else {
             // Si es válido, agregar a la lista de válidos
@@ -421,6 +425,7 @@ function validar_y_corregir_datos_planes($array_datos, $nombre_archivo_errores, 
             }
             // Agregar la línea corregida a los corregidos
             $array_corregidos[] = $linea;
+            $array_validos[] = $linea_corregida;
         } else {
             // Si es válida, agregarla a los válidos
             $array_validos[] = $linea;
@@ -481,6 +486,7 @@ function validar_y_corregir_datos_prerrequisitos($array_datos, $nombre_archivo_e
                 continue; // Saltar a la siguiente iteración
             }
             $array_corregidos[] = $linea;
+            $array_validos[] = $linea_corregida;
         } else {
             // Si es válida, agregarla a los válidos
             $array_validos[] = $linea;
@@ -702,6 +708,7 @@ function validar_y_corregir_datos_notas($array_datos, $nombre_archivo_errores, $
             
             // Agregar la línea corregida al archivo corregido
             $array_corregidos[] = $linea_corregida;
+            $array_validos[] = $linea_corregida;
 
         } else {
             // Si es válido, agregar a la lista de válidos
@@ -722,13 +729,261 @@ function validar_y_corregir_datos_planeacion($array_datos, $nombre_archivo_error
     $array_validos = [];
     $array_errores = [];
     $array_corregidos = [];
+    
+    foreach ($array_datos as $linea) {
+        $es_valido = true;
 
+        // Verificar cada celda de la línea para comprobar si está vacía
+        foreach ($linea as $indice => $celda) {
+            if (!isset($celda) || trim($celda) === '') {
+                $es_valido = false;  // Marcar la línea como inválida
+            }
+        }
+
+        // Validar y corregir Nombre (solo letras y espacios, no nulo)
+        if (!isset($linea[23]) || empty($linea[23]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $linea[23])) {
+            echo "Error: apellido 2 inválido\n";
+            $es_valido = false;
+        }
+        // Validar y corregir Nombre (solo letras y espacios, no nulo)
+        if (!isset($linea[22]) || empty($linea[22]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $linea[22])) {
+            echo "Error: apellido 1 inválido\n";
+            $es_valido = false;
+        }
+        
+        // Si no es válido, guardarlo en el archivo de errores
+        if (!$es_valido) {
+            $array_errores[] = $linea;
+            if (empty(implode('', $linea))) {
+                // Si la línea está completamente vacía, se guarda en el array de invalido
+                $array_invalido[] = $linea;
+                continue; // Omitir el procesamiento de esta línea
+            }
+            // Verificar cada celda de la línea para comprobar si está vacía
+            foreach ($linea as $indice => $celda) {
+                if (!isset($celda) || trim($celda) === '') {
+                    $linea[$indice] = 'x';  // Marcar la línea como inválida
+                    $linea_corregida = $linea;
+                }
+            }
+
+            // Corregir atributos inválidos si es posible
+            $linea_corregida = $linea;
+
+            // Corregir nombres y apellidos
+            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/u', trim($linea[23]))) {
+                $linea_corregida[23] = 'x';
+            } else {
+                $linea_corregida[23] = trim($linea[23]);
+            }
+            // Corregir nombres y apellidos
+            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/u', trim($linea[22]))) {
+                $linea_corregida[22] = 'x';
+            } else {
+                $linea_corregida[22] = trim($linea[22]);
+            }
+
+            // Agregar la línea corregida al archivo corregido
+            $array_corregidos[] = $linea_corregida;
+            $array_validos[] = $linea_corregida;
+
+        } else {
+            // Si es válido, agregar a la lista de válidos
+            $array_validos[] = $linea;
+        }
+    }
+
+    // Guardar los errores y los corregidos en archivos CSV
+    guardar_csv($array_errores, $nombre_archivo_errores);
+    guardar_csv($array_corregidos, $nombre_archivo_corregidos);
+
+    // Retornar los datos válidos
+    return $array_validos;
 }
+
 function validar_y_corregir_datos_docentes($array_datos, $nombre_archivo_errores, $nombre_archivo_corregidos){
     $array_validos = [];
     $array_errores = [];
     $array_corregidos = [];
+    $array_academicos = [];
+    $array_administrativos = [];
 
+    foreach ($array_datos as $linea) {
+        $es_valido = true;
+
+        // Verificar el RUT
+        if (isset($linea[0])) {
+            $rut = trim($linea[0]);
+            if (empty($rut) || !ctype_digit($rut) || !(strlen($rut) <= 8)) {
+                $es_valido = false;
+            } 
+        } else {
+            echo "Error: rut inválido\n";
+            $es_valido = false;
+        }
+
+        // Limpiar nombres y apellidos (solo letras y espacios)
+        if (!isset($linea[1]) || empty($linea[1]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u', $linea[1])) {
+            $es_valido = false;
+           
+        }
+        if (!isset($linea[2]) || empty($linea[2]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/u', $linea[2])) {
+            $es_valido = false;
+            
+        }
+        
+        # grado academico
+        if (!isset($linea[12]) || empty($linea[12]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/u', $linea[12])) {
+            $es_valido = false;
+            
+        }
+        
+        // Limpiar correo personal (eliminar espacios y validar formato básico)
+        $linea[4] = str_replace(' ', '', $linea[4]);
+        if (!isset($linea[4]) || empty($linea[4]) || !filter_var($linea[4], FILTER_VALIDATE_EMAIL)) {
+            $es_valido = false;
+        }
+
+        // Verificar y limpiar correo institucional (debe terminar en @lamejor.cl)
+        $linea[5] = str_replace(' ', '', $linea[5]);
+        if (!isset($linea[5]) || empty($linea[5]) || substr($linea[5], -11) !== '@lamejor.cl') {
+            $es_valido = false;
+        }
+
+        // Limpiar teléfono (solo 9 dígitos)
+        if (!isset($linea[3]) || empty($linea[3]) || !preg_match('/^\d{9}$/', $linea[3])) {
+            $es_valido = false;
+        }
+
+        // Dedicación: Solo números
+        if (!isset($linea[6]) || empty($linea[6]) || !preg_match('/^\d+$/', $linea[6])) {
+            $es_valido = false;
+        }
+
+        // Grado académico: Solo letras y espacios
+        if (!isset($linea[12]) || empty($linea[12]) || !preg_match('/^[a-zA-Z\s]*$/', $linea[12])) {
+            $es_valido = false;
+        }
+
+        // Validar el estamento (debe contener las palabras "administrativo", "academico"")
+        if (!isset($linea[15]) || empty($linea[15]) || !preg_match('/(administrativo|academico|académico)/i', $linea[15])) {
+            echo "Error: esstamento inválido\n", $linea[15];
+            $es_valido = false;
+        }
+
+        // Si no es válido, guardarlo en el archivo de errores
+        if (!$es_valido) {
+            $array_errores[] = $linea;
+            if (empty(implode('', $linea))) {
+                // Si la línea está completamente vacía, se guarda en el array de invalido
+                $array_invalido[] = $linea;
+                continue; // Omitir el procesamiento de esta línea
+            }
+            // Verificar cada celda de la línea para comprobar si está vacía
+            foreach ($linea as $indice => $celda) {
+                if (!isset($celda) || trim($celda) === '') {
+                    $linea[$indice] = 'x';  // Marcar la línea como inválida
+                }
+            }
+
+            // Corregir atributos inválidos si es posible
+            $linea_corregida = $linea;
+            // Limpiar nombres y apellidos (solo letras y espacios)
+            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u', $linea[1])) {
+                $linea_corregida[1] = 'x';
+            }
+            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/u', $linea[2])) {
+                $linea_corregida[2] = 'x';
+            }
+            
+            // Limpiar correo personal (eliminar espacios y validar formato básico)
+            $linea[4] = str_replace(' ', '', $linea[4]);
+            if ($linea[4] !== '' && !filter_var($linea[4], FILTER_VALIDATE_EMAIL)) {
+                $linea_corregida[4] = 'x';
+            }
+
+            // Verificar y limpiar correo institucional (debe terminar en @lamejor.cl)
+            $linea[5] = str_replace(' ', '', $linea[5]);
+            if ($linea[5] !== '' && substr($linea[5], -11) !== '@lamejor.cl') {
+                $linea_corregida[5] = 'x';
+            }
+
+            // Limpiar teléfono (solo 9 dígitos)
+            if ($linea[7] !== '' && !preg_match('/^\d{9}$/', $linea[7])) {
+                $linea_corregida[3] = 'x';
+            }
+
+            // Dedicación: Solo números
+            if ($linea[6] !== '' && !preg_match('/^\d+$/', $linea[6])) {
+                $linea_corregida[6] = 0;
+            }
+
+            # grado academico
+            if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/u', $linea[12])) {
+                $linea_corregida[12] = "x";
+                
+            }
+
+            # ponemos academico o administrrativo si tiene jerarquia o cargo respectivamente
+            if ($linea[13] !== 'x') {
+                $linea_corregida[15] = "academico";
+            }
+
+            if ($linea[14] !== 'x') {
+                $linea_corregida[15] = "administrativo";
+            }
+
+            if ($linea[14] !== 'x' && $linea[13] !== 'x'){
+                $linea_corregida[15] = "academico y administrativo";
+
+            }
+
+            // Asegurarse de no agregar la línea corregida si el RUT es "x"
+            if ($linea[0] !== 'x') {
+                $array_corregidos[] = $linea_corregida;
+                $array_validos[] = $linea_corregida;
+                if (preg_match('/\b(academico|académico)\b/i', $linea[15])) {
+                    $array_academicos[] = $linea_corregida;
+                }
+                // Verificamos si la posición 15 contiene "administrativo"
+                if (preg_match('/\b(administrativo)\b/i', $linea[15])) {
+                    $array_administrativos[] = $linea_corregida;
+                }
+
+                if ($linea[14] !== 'x' && $linea[13] !== 'x'){
+                    $array_administrativos[] = $linea_corregida;
+                    $array_academicos[] = $linea_corregida;
+    
+                }
+
+            }
+
+
+        } else {
+            // Si es válido, agregar a la lista de válidos
+            $array_validos[] = $linea;
+            if (preg_match('/\b(academico|académico)\b/i', $linea[15])) {
+                $array_academicos[] = $linea_corregida;
+            }
+            // Verificamos si la posición 15 contiene "administrativo"
+            if (preg_match('/\b(administrativo)\b/i', $linea[15])) {
+                $array_administrativos[] = $linea_corregida;
+            }
+            // Clasificar en académicos y administrativos
+            
+        }
+    }
+
+    // Guardar los errores y los corregidos en archivos CSV
+    guardar_csv($array_errores, $nombre_archivo_errores);
+    guardar_csv($array_corregidos, $nombre_archivo_corregidos);
+
+    // Retornar los datos válidos
+    return [
+        'validos' => $array_validos,
+        'academicos' => $array_academicos,
+        'administrativos' => $array_administrativos
+    ];
 }
 
 //Función para guardar los datos en un archivo CSV
@@ -739,6 +994,48 @@ function guardar_csv($array_datos, $nombre_archivo) {
     }
     fclose($archivo);
 }
+
+
+## funcion para hacer los array
+function crear_array_academicos($array_academicos) {
+    $array_limpio = [];
+
+    foreach ($array_academicos as $linea) {
+        $rut = $linea[0];            
+        $nombre = $linea[1];             
+        $apellido = $linea[2];       
+        $email_institucional = $linea[5];  
+        $dedicacion = $linea[6]; 
+        $contrato = $linea[7];
+        $grado = $linea[12]; 
+        $jerarquia = $linea[13];      
+        $cargo = $linea[14];  
+        $estamento = $linea[15];    
+
+        if (!isset($linea[15]) || empty($linea[15]) || !preg_match('/(academico|académico)/i', $linea[15])) {
+            $array_limpio[] = [
+                $rut, 
+                $nombre, 
+                $apellido,
+                $email_institucional,
+                $dedicacion,
+                $contrato,
+                $grado,
+                $jerarquia,
+                $cargo,
+                $estamento
+        ];
+            
+        }
+        
+    }
+
+    return $array_limpio;
+}
+
+// function validar_y_corregir_datos_docentes($array_datos, $nombre_archivo_errores, $nombre_archivo_corregidos){
+
+// }
 
 // Función principal, esta es la funcion q juntabtodo y carga los datos en las tablas, la idea es poner todas las funciones de validacion aca adentro cuando esten listas
 function procesar_datos_y_insertar($ruta_archivo, $posicion_rut, $nombre_archivo_errores, $nombre_archivo_corregidos, $database, $tabla) {
@@ -757,15 +1054,14 @@ function procesar_datos_y_insertar($ruta_archivo, $posicion_rut, $nombre_archivo
     }
 }
 
-
 // # trabajo los datos de estudiantes, funcinoa ok.
-$array_datos_1 = abrir_archivo($ruta_estudiantes);
-echo "cantidad de datos en array original", count($array_datos_1);
-echo "\n";
+// $array_datos_1 = abrir_archivo($ruta_estudiantes);
+// echo "cantidad de datos en array original", count($array_datos_1);
+// echo "\n";
 
-$estudiantes_validos = validar_y_corregir_datos_estudiante($array_datos_1, 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv");
-#imprimir_bonito($array_datos_1);
-echo "cantidad de datos en array limpio", count($estudiantes_validos);
+// $estudiantes_validos = validar_y_corregir_datos_estudiante($array_datos_1, 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv");
+// #imprimir_bonito($array_datos_1);
+// echo "cantidad de datos en array limpio", count($estudiantes_validos);
 
 
 // $array_datos_2 = abrir_archivo($ruta_asignaturas);
@@ -800,6 +1096,21 @@ echo "cantidad de datos en array limpio", count($estudiantes_validos);
 // #imprimir_bonito($prerrequisitos_validos);
 // echo "cantidad de datos en array limpio", count($notas_validos);
 
+// $array_datos_6 = abrir_archivo($ruta_planeacion);
+// echo "cantidad de datos en array original", count($array_datos_6);
+// echo "\n";
+
+// $planeacion_validos = validar_y_corregir_datos_planeacion($array_datos_6, "planeacion_invalidos.csv", "planeacion_corregidos.csv");
+// #imprimir_bonito($prerrequisitos_validos);
+// echo "cantidad de datos en array limpio", count($planeacion_validos);
+
+$array_datos_7 = abrir_archivo($ruta_docentes);
+echo "cantidad de datos en array original", count($array_datos_7);
+echo "\n";
+
+$docentes_validos = validar_y_corregir_datos_docentes($array_datos_7, "docentes_invalidos.csv", "docentes_corregidos.csv");
+imprimir_bonito($docentes_validos["academicos"]);
+echo "cantidad de datos en array limpio", count($docentes_validos["academicos"]);
 
 // // Procesar el archivo y manejar los datos
 #procesar_datos_y_insertar("data/estudiantes.csv", 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv", $db, $estudiantes);
