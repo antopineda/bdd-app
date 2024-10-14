@@ -4,31 +4,31 @@
     require('utils.php');
     require('funciones.php');
 
-    try {
-        echo "INICIO DE INSERCIÓN DE DATOS\n";
-        foreach ($path_tablas as $tabla => $path) {
-            $file = fopen($path, 'r');
+    // try {
+    //     echo "INICIO DE INSERCIÓN DE DATOS\n";
+    //     foreach ($path_tablas as $tabla => $path) {
+    //         $file = fopen($path, 'r');
 
-            if ($file) {
-                $header = fgetcsv($file); // Saltar la primera línea
-                while (($data = fgetcsv($file, 0, ',')) !== false) { 
-                    // Verificar restricciones antes de insertar
-                    for ($i = 0; $i < count($data); $i++) {
-                        if ($data[$i] == ''){ 
-                            $data[$i] = Null; // Convertir campos vacíos en NULL, para evitar insertar datos vacíos
-                        }
-                    }
-                    // Realizar toda corrección necesaria antes de insertar
-                    insertar_en_tabla($db, $tabla, $data);
-                }
-                fclose($file);
-            } else {
-                echo "Error al abrir el archivo $path\n";
-            }    
-        } 
-    } catch (Exception $e) {
-        echo "Error al cargar datos: " . $e->getMessage();
-    }
+    //         if ($file) {
+    //             $header = fgetcsv($file); // Saltar la primera línea
+    //             while (($data = fgetcsv($file, 0, ',')) !== false) { 
+    //                 // Verificar restricciones antes de insertar
+    //                 for ($i = 0; $i < count($data); $i++) {
+    //                     if ($data[$i] == ''){ 
+    //                         $data[$i] = Null; // Convertir campos vacíos en NULL, para evitar insertar datos vacíos
+    //                     }
+    //                 }
+    //                 // Realizar toda corrección necesaria antes de insertar
+    //                 insertar_en_tabla($db, $tabla, $data);
+    //             }
+    //             fclose($file);
+    //         } else {
+    //             echo "Error al abrir el archivo $path\n";
+    //         }    
+    //     } 
+    // } catch (Exception $e) {
+    //     echo "Error al cargar datos: " . $e->getMessage();
+    // }
 
     try {
         echo "INICIO DE INSERCIÓN DE DATOS ESTUDIANTES\n";
@@ -93,15 +93,15 @@
         echo "INICIO DE INSERCIÓN DE DATOS ACADÉMICOS/ADMIN\n";
         $array_docentes = abrir_archivo($path_tablas['docentes_planificados']);
         $corregidos_docente = validar_y_corregir_datos_docentes($array_docentes, 'docentes_invalidos.csv', 'docentes_corregidos.csv');
-        $array_academico = crear_array_academicos($corregidos_docente);
-        $array_administrativo = crear_array_administrativos($corregidos_docente);
+        $array_academico = crear_array_academicos($corregidos_docente["academicos"]);
+        $array_administrativo = crear_array_administrativos($corregidos_docente["administrativos"]);
 
         foreach ($array_academico as $fila) {
             insertar_en_tabla($db, 'academico', $fila);
         }
 
         foreach ($array_administrativo as $fila) {
-            insertar_en_tabla($db, 'administrativo', $fila)
+            insertar_en_tabla($db, 'administrativo', $fila);
         }
     } catch (Exception $e) {
         echo "Error al cargar academicos/admin: " . $e->getMessage();
@@ -110,9 +110,9 @@
     try {
         echo "INICIO DE INSERCIÓN DE DATOS OFERTA\n";
         $array_planeacion = abrir_archivo($path_tablas['planeacion']);
-        $corregidos_planeacion = validar_y_corregir_datos_notas($array_planeacion, 'planeacion_invalidos.csv', 'planeacion_corregidos.csv');
+        $corregidos_planeacion = validar_y_corregir_datos_planeacion($array_planeacion, 'planeacion_invalidos.csv', 'planeacion_corregidos.csv');
 
-        foreach ($corregidos_notas as $fila) {
+        foreach ($corregidos_planeacion as $fila) {
             insertar_en_tabla($db, 'oferta', $fila);
     }
     } catch (Exception $e) {
