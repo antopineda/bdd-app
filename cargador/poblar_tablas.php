@@ -89,4 +89,34 @@
         echo "Error al cargar historial: " . $e->getMessage();
     }
 
+    try {
+        echo "INICIO DE INSERCIÓN DE DATOS ACADÉMICOS/ADMIN\n";
+        $array_docentes = abrir_archivo($path_tablas['docentes_planificados']);
+        $corregidos_docente = validar_y_corregir_datos_docentes($array_docentes, 'docentes_invalidos.csv', 'docentes_corregidos.csv');
+        $array_academico = crear_array_academicos($corregidos_docente);
+        $array_administrativo = crear_array_administrativos($corregidos_docente);
+
+        foreach ($array_academico as $fila) {
+            insertar_en_tabla($db, 'academico', $fila);
+        }
+
+        foreach ($array_administrativo as $fila) {
+            insertar_en_tabla($db, 'administrativo', $fila)
+        }
+    } catch (Exception $e) {
+        echo "Error al cargar academicos/admin: " . $e->getMessage();
+    }
+
+    try {
+        echo "INICIO DE INSERCIÓN DE DATOS OFERTA\n";
+        $array_planeacion = abrir_archivo($path_tablas['planeacion']);
+        $corregidos_planeacion = validar_y_corregir_datos_notas($array_planeacion, 'planeacion_invalidos.csv', 'planeacion_corregidos.csv');
+
+        foreach ($corregidos_notas as $fila) {
+            insertar_en_tabla($db, 'oferta', $fila);
+    }
+    } catch (Exception $e) {
+        echo "Error al cargar oferta: " . $e->getMessage();
+    }
+
 ?> 

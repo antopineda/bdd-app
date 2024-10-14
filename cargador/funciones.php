@@ -17,7 +17,7 @@ function abrir_archivo($ruta) {
         $linea = fgets($archivo_datos_1);
         $linea = rtrim($linea); // Elimina el salto de línea y espacios en blanco al final
         if (!empty($linea)) { // Verifica que la línea no esté vacía
-            $array_datos_1[] = explode(";", $linea);
+            $array_datos_1[] = explode(",", $linea);
         }
     }
     fclose($archivo_datos_1);
@@ -702,9 +702,22 @@ function validar_y_corregir_datos_notas($array_datos, $nombre_archivo_errores, $
             }
 
             // # si no hay nota no poner fila de array validos y de corregidos
-            // if (!isset($linea[15]) || !is_numeric(trim($linea[15])) || floatval(trim($linea[15])) < 1 || floatval(trim($linea[15])) > 7) {
-            //     continue;
-            // }
+            // Verificar si el valor es una cadena que contiene una coma como separador decimal
+            $valor = $linea[15];
+
+            if (is_null($valor) || $valor === '') {
+                $linea_corregida[15] null;  // Mantener el valor nulo
+            }
+
+            if (is_string($valor) && strpos($valor, ',') !== false) {
+                // Reemplazar la coma con un punto
+                $valor = str_replace(',', '.', $valor);
+            }
+            
+            // Intentar convertir a decimal
+            if (is_numeric($valor)) {
+                $linea_corregida[15] = (float)$valor;  // Convertir el valor a tipo float si es numérico
+            }
             
             // Agregar la línea corregida al archivo corregido
             $array_corregidos[] = $linea_corregida;
@@ -1028,6 +1041,141 @@ function crear_array_academicos($array_academicos) {
             
         }
         
+    }
+
+    return $array_limpio;
+}
+
+function crear_array_administrativos($arrary){
+    $array_limpio = [];
+
+    foreach ($array_academicos as $linea) {
+        $rut = $linea[0];            
+        $nombre = $linea[1];             
+        $apellido = $linea[2];       
+        $email_institucional = $linea[5];  
+        $dedicacion = $linea[6]; 
+        $contrato = $linea[7];
+        $grado = $linea[12]; 
+        $jerarquia = $linea[13];      
+        $cargo = $linea[14];  
+        $estamento = $linea[15];    
+
+        if (!isset($linea[15]) || empty($linea[15]) || !preg_match('/(administrativo)/i', $linea[15])) {
+            $array_limpio[] = [
+                $rut, 
+                $nombre, 
+                $apellido,
+                $email_institucional,
+                $dedicacion,
+                $contrato,
+                $grado,
+                $jerarquia,
+                $cargo,
+                $estamento
+        ];
+            
+        }
+        
+    }
+
+    return $array_limpio;
+
+}
+
+function crear_array_asinaturas($arrary){
+    return $array;
+}
+
+function crear_array_estudiantes($arrary){
+    return $array;
+}
+
+function crear_array_planes($arrary){
+    return $array;
+}
+
+function crear_array_prerrequisitos($arrary){
+    return $array;
+}
+
+function crear_array_historial($arrary){
+    $array_limpio = [];
+
+    foreach ($array_academicos as $linea) {
+        $rut = $linea[4];    
+        $codigo_plan = $linea[0];        
+        $num_alumno = $linea[9];             
+        $periodo = $linea[10];       
+        $codigo_asignatura = $linea[11];        
+        $convocatoria = $linea[13];  
+        $calificacion = $linea[14]; 
+        $nota = $linea[15];
+
+
+        $array_limpio[] = [
+            $rut, 
+            $codigo_plan, 
+            $num_alumno,
+            $periodo,
+            $codigo_asignatura,
+            $convocatoria,
+            $calificacion,
+            $nota,
+    ];
+    }
+
+    return $array_limpio;
+
+}
+
+function crear_array_oferta($array_academicos) {
+    $array_limpio = [];
+
+    foreach ($array_academicos as $linea) {
+        // Extraer los valores de las columnas que necesitas
+        $periodo = $linea[0];    
+        $sede = $linea[1];        
+        $factultad = $linea[2];             
+        $codigo_depto = $linea[3];       
+        $codigo_asignatura = $linea[6];        
+        $seccion = $linea[8];  
+        $duracion = $linea[9]; 
+        $vacantes = $linea[11];
+        $inscritos = $linea[12]; 
+        $dia = $linea[12];
+        $hora_inicio = $linea[13]; 
+        $hora_fin = $linea[14];
+        $fecha_inicio = $linea[15]; 
+        $fecha_fin = $linea[16];
+        $edificio = $linea[18];
+        $profe_run = $linea[20];
+        $profe_nombre = $linea[21];
+        $profe_apellido = $linea[22];
+        $jerarquia = $linea[24];
+
+        // Añadir una nueva línea al array limpio con los valores requeridos
+        $array_limpio[] = [
+            $periodo,            // 0
+            $sede,               // 1
+            $factultad,          // 2
+            $codigo_depto,       // 3
+            $codigo_asignatura,  // 6
+            $seccion,            // 8
+            $duracion,           // 9
+            $vacantes,           // 11
+            $inscritos,          // 12
+            $dia,                // 12
+            $hora_inicio,        // 13
+            $hora_fin,           // 14
+            $fecha_inicio,       // 15
+            $fecha_fin,          // 16
+            $edificio,           // 18
+            $profe_run,          // 20
+            $profe_nombre,       // 21
+            $profe_apellido,     // 22
+            $jerarquia           // 24
+        ];
     }
 
     return $array_limpio;
