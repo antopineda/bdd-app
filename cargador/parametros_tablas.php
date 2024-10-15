@@ -34,7 +34,8 @@ $tablas_iniciales = array(
     'administrativo' => 'run VARCHAR(8) NOT NULL PRIMARY KEY, nombre VARCHAR(50), apellido VARCHAR(50), email_institucional VARCHAR(50), dedicacion VARCHAR(50), contrato VARCHAR(50), grado VARCHAR(50), jerarquia VARCHAR(50), cargo VARCHAR(50) NOT NULL, estamento VARCHAR(50)',
     'oferta' => 'id SERIAL PRIMARY KEY, periodo VARCHAR(7), sede VARCHAR(200), facultad VARCHAR(100), id_depto VARCHAR(10), asignatura_id VARCHAR(10), seccion VARCHAR(4), duracion VARCHAR(20), vacantes VARCHAR(10), inscritos VARCHAR(10), dia VARCHAR(10), hora_inicio VARCHAR(10), hora_fin VARCHAR(10), fecha_inicio VARCHAR(10), fecha_fin VARCHAR(10), edificio VARCHAR(100), profesor_run VARCHAR(8), profesor_nombre VARCHAR(50), profesor_apellido VARCHAR(50), jerarquizacion VARCHAR(50)',
     'personas' => 'run VARCHAR(8) NOT NULL PRIMARY KEY, nombre VARCHAR(50), apellido VARCHAR(50), email VARCHAR(50), telefono VARCHAR(9), estamento VARCHAR(50)',
-    
+    'usuarios' => 'email VARCHAR(50) PRIMARY KEY, password VARCHAR(255), role VARCHAR(30)'
+
 );
 
 // Tablas que estan tal cual: asignaturas, estudiantes, planes, prerequisitos
