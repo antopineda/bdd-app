@@ -745,9 +745,9 @@ function validar_y_corregir_datos_planeacion($array_datos, $nombre_archivo_error
 
             // Corregir nombres y apellidos
             if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/u', trim($linea[23]))) {
-                $linea_corregida[23] = 'x';
+                $linea_corregida[21] = 'x';
             } else {
-                $linea_corregida[23] = trim($linea[23]);
+                $linea_corregida[21] = trim($linea[21]);
             }
             // Corregir nombres y apellidos
             if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/u', trim($linea[22]))) {
