@@ -9,7 +9,7 @@ $base_path = __DIR__ . '/../data/';
 // $ruta_asignaturas = $base_path . "asignaturas.csv";
 // $ruta_planes = $base_path . "planes.csv";
 // $ruta_prerrequisitos = $base_path . "prerequisitos.csv";
-$ruta_notas = $base_path . "notas.csv";
+// $ruta_notas = $base_path . "notas.csv";
 // $ruta_planeacion = $base_path . "planeacion.csv";
 // $ruta_docentes = $base_path . "docentes_planificados.csv";
 
@@ -116,9 +116,54 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
 
         ## si el logro no contiene la palabra semestre, ingreso o licenciatura, ES INVALIDO
         // Validar el logro (debe contener las palabras "semestre", "ingreso", o "licenciatura")
-        if (!isset($linea[12]) || empty($linea[12]) || !preg_match('/(semestre|ingreso|licenciatura)/i', $linea[12])) {
-            $es_valido = false;
+        // if (!isset($linea[12]) || empty($linea[12]) || !preg_match('/(semestre|ingreso|licenciatura)/i', $linea[12])) {
+        //     $es_valido = false;
+        // }
+
+        $logro = $linea[12];  // Ejemplo: "QUINTO AÑO"
+
+        // Crear un mapa para convertir los nombres ordinales a números
+        $ordenes = [
+            'PRIMER' => 1,
+            'SEGUNDO' => 2,
+            'TERCER' => 3,
+            'CUARTO' => 4,
+            'QUINTO' => 5,
+            'SEXTO' => 6,
+            'SÉPTIMO' => 7,  
+            'SEPTIMO' => 7,  
+            'OCTAVO' => 8,
+            'NOVENO' => 9,
+            'DÉCIMO' => 10,
+            'DECIMO' => 10,
+        ];
+
+        // Buscar coincidencias con el formato ordinal (en cualquier parte del texto)
+        if (preg_match('/(PRIMER|SEGUNDO|TERCER|CUARTO|QUINTO)\s*AÑO/i', $logro, $matches)) {
+            $año_ordinal = $matches[1];  // Extraer la palabra ordinal
+            // Convertir el ordinal a un número usando el mapa
+            if (isset($ordenes[strtoupper($año_ordinal)])) {
+                $año = $ordenes[strtoupper($año_ordinal)];
+                $semestre_corregido = $año * 2;  // Convertir años a semestres
+                $linea[12] = $semestre_corregido . " SEMESTRE";
+                
+            }
         }
+        else if (preg_match('/(PRIMER|SEGUNDO|TERCER|CUARTO|QUINTO|SEXTO|S[EÉ]PTIMO|OCTAVO|NOVENO|D[ÉE]CIMO)\s*SEMESTRE/i', $logro, $matches)) {
+            $semestre_ordinal = $matches[1];  // Extraer la palabra ordinal
+            // Convertir el ordinal a un número usando el mapa
+            if (isset($ordenes[strtoupper($semestre_ordinal)])) {
+                $semestre = $ordenes[strtoupper($semestre_ordinal)];
+                $linea[12] = $semestre . " SEMESTRE";  // Ya es un semestre, no hay que multiplicar
+            }
+        }
+        // Buscar coincidencias con números seguidos de "AÑO" (como "1 AÑO", "2 AÑO", "5 AÑO")
+        else if (preg_match('/(\d+)\s*AÑO/i', $logro, $matches)) {
+            $año_numero = (int)$matches[1];  // Convertir el número a entero
+            $semestre_corregido = $año_numero * 2;  // Convertir años a semestres
+            $linea[12] = $semestre_corregido . " SEMESTRE";  // Cambiar a formato semestre
+        }
+
 
         // Validar Fecha Último Logro (formato YYYY-MM-DD)
         if (!isset($linea[13]) || empty($linea[13]) || !preg_match('/^\d{4}-(01|02)$/', $linea[13])) {
@@ -159,11 +204,12 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
             }
 
             // Corregir ultimo logro
-            if (!isset($linea[14]) || !preg_match('/^\d{4}-(01|02)$/', trim($linea[14]))) {
-                $linea_corregida[14] = 'x';
-            } else {
-                $linea_corregida[14] = trim($linea[14]);
-            }
+            // if (!isset($linea[14]) || !preg_match('/^\d{4}-(01|02)$/', trim($linea[14]))) {
+            //     $linea_corregida[14] = 'x';
+            // } else {
+            //     $linea_corregida[14] = trim($linea[14]);
+            // }
+
 
             // Corregir Número de Estudiante
             if (!isset($linea[3]) || !preg_match('/^\d{6}$/', trim($linea[3]))) {
@@ -211,12 +257,14 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
                 $linea_corregida[11] = trim($linea[11]);
             }
 
-            $logro = $linea[12]; #es 1 ANO
-            if (preg_match('/(\d+)\s*AÑO/i', $logro, $matches)) {
-                $anio = (int)$matches[1];
-                $semestre_corregido = $anio * 2; // Convertir años a semestres
-                $linea_corregida[12] = $semestre_corregido . " semestre";
-            }
+            // $logro = $linea[12]; #es 1 ANO
+            // if (preg_match('/(\d+)\s*AÑO/i', $logro, $matches)) {
+            //     $anio = (int)$matches[1];
+            //     $semestre_corregido = $anio * 2; // Convertir años a semestres
+            //     $linea_corregida[12] = $semestre_corregido . " semestre";
+            // }
+
+
             // Agregar la línea corregida al archivo corregido
             $array_corregidos[] = $linea_corregida;
             $array_validos[] = $linea_corregida;
@@ -1144,7 +1192,7 @@ function crear_array_oferta($array) {
 // echo "\n";
 
 // $estudiantes_validos = validar_y_corregir_datos_estudiante($array_datos_1, 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv");
-// #imprimir_bonito($array_datos_1);
+// imprimir_bonito($estudiantes_validos);
 // echo "cantidad de datos en array limpio", count($estudiantes_validos);
 
 
@@ -1172,13 +1220,13 @@ function crear_array_oferta($array) {
 // #imprimir_bonito($prerrequisitos_validos);
 // echo "cantidad de datos en array limpio", count($prerrequisitos_validos);
 
-$array_datos_5 = abrir_archivo($ruta_notas);
-echo "cantidad de datos en array original", count($array_datos_5);
-echo "\n";
+// $array_datos_5 = abrir_archivo($ruta_notas);
+// echo "cantidad de datos en array original", count($array_datos_5);
+// echo "\n";
 
-$notas_validos = validar_y_corregir_datos_notas($array_datos_5, "notas_invalidos.csv", "notas_corregidos.csv");
-imprimir_bonito($notas_validos);
-echo "cantidad de datos en array limpio", count($notas_validos);
+// $notas_validos = validar_y_corregir_datos_notas($array_datos_5, "notas_invalidos.csv", "notas_corregidos.csv");
+// imprimir_bonito($notas_validos);
+// echo "cantidad de datos en array limpio", count($notas_validos);
 
 // $array_datos_6 = abrir_archivo($ruta_planeacion);
 // echo "cantidad de datos en array original", count($array_datos_6);
