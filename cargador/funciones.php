@@ -1,22 +1,22 @@
 <?php
-ini_set('memory_limit', '1G');  
+ini_set('memory_limit', '3G');  
 
+// $base_path = __DIR__ . '/../data/';
 
-$base_path = __DIR__ . '/../data/';
-
-// Construir las rutas de los archivos de manera universal
-$ruta_estudiantes = $base_path . "estudiantes.csv";
-$ruta_asignaturas = $base_path . "asignaturas.csv";
-$ruta_planes = $base_path . "planes.csv";
-$ruta_prerrequisitos = $base_path . "prerequisitos.csv";
-$ruta_notas = $base_path . "notas.csv";
-$ruta_planeacion = $base_path . "planeacion.csv";
-$ruta_docentes = $base_path . "docentes_planificados.csv";
+// // Construir las rutas de los archivos de manera universal
+// $ruta_estudiantes = $base_path . "estudiantes.csv";
+// $ruta_asignaturas = $base_path . "asignaturas.csv";
+// $ruta_planes = $base_path . "planes.csv";
+// $ruta_prerrequisitos = $base_path . "prerequisitos.csv";
+// $ruta_notas = $base_path . "notas.csv";
+// $ruta_planeacion = $base_path . "planeacion.csv";
+// $ruta_docentes = $base_path . "docentes_planificados.csv";
 
 
 function abrir_archivo($ruta) {
     $archivo_datos_1 = fopen($ruta, "r"); // Abrir archivo en modo lectura
     $array_datos_1 = [];
+    fgets($archivo_datos_1); // Leer y descartar la primera línea
     while (!feof($archivo_datos_1)) {
         $linea = fgets($archivo_datos_1);
         $linea = rtrim($linea); // Elimina el salto de línea y espacios en blanco al final
@@ -1223,13 +1223,13 @@ function crear_array_oferta($array) {
 // #imprimir_bonito($array_datos_1);
 // echo "cantidad de datos en array limpio asinaturas", count($asignaturas_validos);
 
-$array_datos_3 = abrir_archivo($ruta_planes);
-echo "cantidad de datos en array original PLANES", count($array_datos_3);
-echo "\n";
+// $array_datos_3 = abrir_archivo($ruta_planes);
+// echo "cantidad de datos en array original PLANES", count($array_datos_3);
+// echo "\n";
 
-$planes_validos = validar_y_corregir_datos_planes($array_datos_3, "planes_invalidos.csv", "planes_corregidos.csv");
-#imprimir_bonito($array_datos_1);
-echo "cantidad de datos en array limpio PLANES", count($planes_validos);
+// $planes_validos = validar_y_corregir_datos_planes($array_datos_3, "planes_invalidos.csv", "planes_corregidos.csv");
+// #imprimir_bonito($array_datos_1);
+// echo "cantidad de datos en array limpio PLANES", count($planes_validos);
 
 // $array_datos_4 = abrir_archivo($ruta_prerrequisitos);
 // echo "cantidad de datos en array original", count($array_datos_4);
@@ -1246,6 +1246,10 @@ echo "cantidad de datos en array limpio PLANES", count($planes_validos);
 // $notas_validos = validar_y_corregir_datos_notas($array_datos_5, "notas_invalidos.csv", "notas_corregidos.csv");
 // #imprimir_bonito($notas_validos);
 // echo "\ncantidad de datos en array limpio NOTAS ", count($notas_validos);
+
+// $historial = crear_array_historial($notas_validos);
+// echo "\ncantidad de datos en array limpio HISTORIAL ", count($historial);
+
 
 // $array_datos_6 = abrir_archivo($ruta_planeacion);
 // echo "\ncantidad de datos en array original", count($array_datos_6);
