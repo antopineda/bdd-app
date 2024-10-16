@@ -4,14 +4,14 @@ ini_set('memory_limit', '1G');
 
 $base_path = __DIR__ . '/../data/';
 
-// // Construir las rutas de los archivos de manera universal
-// $ruta_estudiantes = $base_path . "estudiantes.csv";
-// $ruta_asignaturas = $base_path . "asignaturas.csv";
-// $ruta_planes = $base_path . "planes.csv";
-// $ruta_prerrequisitos = $base_path . "prerequisitos.csv";
-// $ruta_notas = $base_path . "notas.csv";
-// $ruta_planeacion = $base_path . "planeacion.csv";
-// $ruta_docentes = $base_path . "docentes_planificados.csv";
+// Construir las rutas de los archivos de manera universal
+$ruta_estudiantes = $base_path . "estudiantes.csv";
+$ruta_asignaturas = $base_path . "asignaturas.csv";
+$ruta_planes = $base_path . "planes.csv";
+$ruta_prerrequisitos = $base_path . "prerequisitos.csv";
+$ruta_notas = $base_path . "notas.csv";
+$ruta_planeacion = $base_path . "planeacion.csv";
+$ruta_docentes = $base_path . "docentes_planificados.csv";
 
 
 function abrir_archivo($ruta) {
@@ -27,6 +27,7 @@ function abrir_archivo($ruta) {
     fclose($archivo_datos_1);
     return $array_datos_1;
 }
+
 
 function imprimir_bonito($array_de_arrays) {
     // Obtiene el número de columnas
@@ -531,6 +532,7 @@ function validar_y_corregir_datos_notas($array_datos, $nombre_archivo_errores, $
     $array_validos = [];
     $array_errores = [];
     $array_corregidos = [];
+    
     foreach ($array_datos as $linea) {
         $es_valido = true;
 
@@ -606,10 +608,14 @@ function validar_y_corregir_datos_notas($array_datos, $nombre_archivo_errores, $
         # nota
         if (isset($linea[15])) {
             $nota = trim($linea[15]);
+            // Intentar convertir a decimal
+            if (is_numeric($nota)) {
+                $linea[15] = floatval($nota);  // Convertir el valor a tipo float si es numérico
+            }
             if (!is_numeric($nota) || floatval($nota) < 1 || floatval($nota) > 7) {
                 $es_valido = false;
             }
-        }}
+        }
 
 
         // Si no es válido, guardarlo en el archivo de errores
@@ -651,7 +657,6 @@ function validar_y_corregir_datos_notas($array_datos, $nombre_archivo_errores, $
             } else {
                 $linea_corregida[5] = trim($linea[5]);
             }
-
 
             // Corregir nombres y apellidos
             if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/u', trim($linea[6]))) {
@@ -737,8 +742,8 @@ function validar_y_corregir_datos_notas($array_datos, $nombre_archivo_errores, $
             // Si es válido, agregar a la lista de válidos
             $array_validos[] = $linea;
         }
-    
-
+    }
+        
     // Guardar los errores y los corregidos en archivos CSV
     guardar_csv($array_errores, $nombre_archivo_errores);
     guardar_csv($array_corregidos, $nombre_archivo_corregidos);
@@ -1077,10 +1082,7 @@ function crear_array_administrativos($array){
             $jerarquia,
             $cargo,
             $estamento
-    ];
-        
-        
-        
+    ];     
     }
 
     return $array_limpio;
@@ -1088,7 +1090,24 @@ function crear_array_administrativos($array){
 }
 
 function crear_array_asinaturas($array){
-    return $array;
+    $array_limpio = [];
+
+    foreach ($array as $linea) {
+        $plan = $linea[0];            
+        $codigo = $linea[1];             
+        $ape = $linea[2];       
+        $email_institucional = $linea[3];  
+
+        $array_limpio[] = [
+            $plan, 
+            $nombre, 
+            $apellido,
+            $email_institucional,
+            
+    ];     
+    }
+
+    return $array_limpio;
 }
 
 function crear_array_estudiantes($array){
@@ -1105,7 +1124,7 @@ function crear_array_prerrequisitos($array){
 
 function crear_array_historial($array){
     $array_limpio = [];
-
+    
     foreach ($array as $linea) {
         $rut = $linea[4];    
         $codigo_plan = $linea[0];        
@@ -1192,7 +1211,7 @@ function crear_array_oferta($array) {
 // echo "\n";
 
 // $estudiantes_validos = validar_y_corregir_datos_estudiante($array_datos_1, 6, "estudiantes_invalidos.csv", "estudiantes_corregidos.csv");
-// imprimir_bonito($estudiantes_validos);
+// #imprimir_bonito($estudiantes_validos);
 // echo "cantidad de datos en array limpio", count($estudiantes_validos);
 
 
@@ -1220,28 +1239,28 @@ function crear_array_oferta($array) {
 // #imprimir_bonito($prerrequisitos_validos);
 // echo "cantidad de datos en array limpio", count($prerrequisitos_validos);
 
-// $array_datos_5 = abrir_archivo($ruta_notas);
-// echo "cantidad de datos en array original", count($array_datos_5);
-// echo "\n";
+$array_datos_5 = abrir_archivo($ruta_notas);
+echo "\ncantidad de datos en array original NOTAS ", count($array_datos_5);
+echo "\n";
 
-// $notas_validos = validar_y_corregir_datos_notas($array_datos_5, "notas_invalidos.csv", "notas_corregidos.csv");
-// imprimir_bonito($notas_validos);
-// echo "cantidad de datos en array limpio", count($notas_validos);
+$notas_validos = validar_y_corregir_datos_notas($array_datos_5, "notas_invalidos.csv", "notas_corregidos.csv");
+#imprimir_bonito($notas_validos);
+echo "\ncantidad de datos en array limpio NOTAS ", count($notas_validos);
 
 // $array_datos_6 = abrir_archivo($ruta_planeacion);
-// echo "cantidad de datos en array original", count($array_datos_6);
+// echo "\ncantidad de datos en array original", count($array_datos_6);
 // echo "\n";
 
 // $planeacion_validos = validar_y_corregir_datos_planeacion($array_datos_6, "planeacion_invalidos.csv", "planeacion_corregidos.csv");
 // #imprimir_bonito($prerrequisitos_validos);
 // echo "cantidad de datos en array limpio", count($planeacion_validos);
 
-// $array_datos_7 = abrir_archivo($path_tablas['docentes_planificados']);
+// $array_datos_7 = abrir_archivo($ruta_docentes);
 // echo "cantidad de datos en array original", count($array_datos_7);
 // echo "\n";
 
 // $docentes_validos = validar_y_corregir_datos_docentes($array_datos_7, "docentes_invalidos.csv", "docentes_corregidos.csv");
-// imprimir_bonito($docentes_validos["academicos"]);
+// #imprimir_bonito($docentes_validos["academicos"]);
 // echo "cantidad de datos en array limpio", count($docentes_validos["academicos"]);
 
 // $array_administrativo = crear_array_administrativos($corregidos_docente["administrativos"]);
