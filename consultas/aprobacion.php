@@ -4,47 +4,60 @@
     <?php
     require("../config/conexion.php");
 
-    // Obtiene el periodo de la entrada del usuario
-    $periodo = $_POST['periodo'];
+    // Obtener el periodo desde el formulario
+    $periodo = $_POST["periodo"];
+    echo "<h2>Porcentaje de aprobación por curso para el periodo $periodo</h2>";
 
-    echo "<h2>Porcentaje de aprobación por periodo</h2>";
-
-    // Consulta SQL
+    // Consulta SQL para obtener el porcentaje de aprobación por curso
     $query = "
         SELECT 
-            o.asignatura_id AS codigo_curso, 
-            o.profesor_nombre, 
+            o.codigo_asignatura,
+            o.nombre_asignatura,
+            o.profesor_nombre,
             o.profesor_apellido,
-            COUNT(CASE WHEN h.nota >= 4.0 THEN 1 END) * 100.0 / NULLIF(COUNT(h.num_alumno), 0) AS porcentaje_aprobacion
-        FROM oferta o
-        LEFT JOIN historial h ON o.asignatura_id = h.codigo_asignatura AND h.periodo = :periodo
-        WHERE o.periodo = :periodo
-        GROUP BY o.asignatura_id, o.profesor_nombre, o.profesor_apellido
-        ORDER BY o.asignatura_id;
+            COUNT(CASE WHEN h.nota >= 4.0 THEN 1 END) * 100.0 / NULLIF(COUNT(h.nota), 0) AS porcentaje_aprobacion
+        FROM 
+            oferta o
+        LEFT JOIN 
+            historial h ON o.codigo_asignatura = h.codigo_asignatura AND h.periodo = :periodo
+        GROUP BY 
+            o.codigo_asignatura, o.nombre_asignatura, o.profesor_nombre, o.profesor_apellido
+        ORDER BY 
+            o.codigo_asignatura;
     ";
 
+    // Preparar y ejecutar la consulta
     $result = $db->prepare($query);
-    $result->execute(['periodo' => $periodo]);
-    $aprobacion = $result->fetchAll();
+    $result->bindParam(':periodo', $periodo, PDO::PARAM_STR);
+    
+    if ($result->execute()) {
+        $cursos = $result->fetchAll();
 
-    ?>
-
-    <table class="styled-table">
-        <tr>
-            <th>Código de Curso</th>
-            <th>Nombre del Profesor</th>
-            <th>Porcentaje de Aprobación</th>
-        </tr>
-        <?php
-        foreach ($aprobacion as $a) {
-            echo "<tr>
-                    <td>$a[codigo_curso]</td>
-                    <td>$a[profesor_nombre] $a[profesor_apellido]</td>
-                    <td>" . round($a['porcentaje_aprobacion'], 2) . "%</td>
-                  </tr>";
+        // Mostrar resultados
+        if (count($cursos) > 0) {
+            echo '<table class="styled-table">
+                    <tr>
+                        <th>Código de Curso</th>
+                        <th>Nombre de Curso</th>
+                        <th>Profesor</th>
+                        <th>Porcentaje de Aprobación</th>
+                    </tr>';
+            foreach ($cursos as $curso) {
+                echo "<tr>
+                        <td>{$curso['codigo_asignatura']}</td>
+                        <td>{$curso['nombre_asignatura']}</td>
+                        <td>{$curso['profesor_nombre']} {$curso['profesor_apellido']}</td>
+                        <td>" . round($curso['porcentaje_aprobacion'], 2) . "%</td>
+                    </tr>";
+            }
+            echo '</table>';
+        } else {
+            echo "<p>No se encontraron cursos para el periodo especificado.</p>";
         }
-        ?>
-    </table>
+    } else {
+        echo "<p>Error en la ejecución de la consulta.</p>";
+    }
+    ?>
 </body>
 
 <?php include('../templates/footer.html'); ?>
