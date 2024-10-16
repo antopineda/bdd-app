@@ -31,6 +31,24 @@
     // }
 
     try {
+        echo "INICIO DE INSERCIÓN DE DATOS USUARIOS\n";
+        
+        $file = fopen('../data/usuarios.csv', 'r');
+        
+        if ($file) {
+            $header = fgetcsv($file); // Saltar la primera línea (encabezados)
+            // Leer la única línea de datos
+            $data = fgetcsv($file, 0, ',');
+            insertar_en_tabla($db, 'usuarios', $data);
+            fclose($file);
+        } else {
+            echo "Error al abrir el archivo usuarios.csv\n";
+        }
+    } catch (Exception $e) {
+        echo "Error al cargar usuarios: " . $e->getMessage();
+    }
+
+    try {
         echo "INICIO DE INSERCIÓN DE DATOS ESTUDIANTES\n";
         $array_estudiantes = abrir_archivo($path_tablas['estudiantes']);
         $corregidos_est = validar_y_corregir_datos_estudiante($array_estudiantes, 6, 'estudiantes_invalidos.csv', 'estudiantes_corregidos.csv');
@@ -119,24 +137,6 @@
     }
     } catch (Exception $e) {
         echo "Error al cargar oferta: " . $e->getMessage();
-    }
-
-    try {
-        echo "INICIO DE INSERCIÓN DE DATOS USUARIOS\n";
-        
-        $file = fopen('../data/usuarios.csv', 'r');
-        
-        if ($file) {
-            $header = fgetcsv($file); // Saltar la primera línea (encabezados)
-            // Leer la única línea de datos
-            $data = fgetcsv($file, 0, ',');
-            insertar_en_tabla($db, 'usuarios', $data);
-            fclose($file);
-        } else {
-            echo "Error al abrir el archivo usuarios.csv\n";
-        }
-    } catch (Exception $e) {
-        echo "Error al cargar usuarios: " . $e->getMessage();
     }
 
 ?> 
