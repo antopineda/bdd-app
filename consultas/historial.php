@@ -15,7 +15,7 @@
                    COUNT(CASE WHEN h.nota >= 4.0 THEN 1 END) OVER (PARTITION BY h.periodo) AS aprobados,
                    COUNT(CASE WHEN h.nota < 4.0 THEN 1 END) OVER (PARTITION BY h.periodo) AS reprobados,
                    COUNT(CASE WHEN h.periodo = '2024-2' THEN 1 END) OVER (PARTITION BY h.periodo) AS vigentes,
-                   AVG(CASE WHEN h.nota IS NOT NULL THEN h.nota END) OVER (PARTITION BY h.periodo) AS PPS
+                   AVG(CASE WHEN h.nota IS NOT NULL THEN h.nota END) OVER (PARTITION BY h.periodo) AS pps
             FROM historial h
             WHERE h.num_alumno = :num_alumno
             ORDER BY h.periodo ASC;
@@ -31,7 +31,7 @@
         $total_reprobados = 0;
         $total_vigentes = 0;
         $total_nota = 0;
-        $total_periodos = 0;
+        $total_periodos_validos = 0; // Contar solo los periodos donde PPS es distinto de 0
         ?>
 
         <table class="styled-table">
@@ -48,6 +48,9 @@
 
             <?php
             foreach ($historial as $registro) {
+                $pps_formatted = number_format($registro['pps'], 2);
+
+                // Mostrar la fila en la tabla
                 echo "<tr>
                         <td>{$registro['periodo']}</td>
                         <td>{$registro['codigo_asignatura']}</td>
@@ -56,19 +59,22 @@
                         <td>{$registro['aprobados']}</td>
                         <td>{$registro['reprobados']}</td>
                         <td>{$registro['vigentes']}</td>
-                        <td>" . number_format($registro['pps'], 2) . "</td>
+                        <td>{$pps_formatted}</td>
                       </tr>";
 
-                // Sumar totales para el resumen
+                // Sumar totales para el resumen solo si PPS es distinto de 0
+                if ($registro['pps'] != 0) {
+                    $total_nota += $registro['pps'];
+                    $total_periodos_validos++;
+                }
+
                 $total_aprobados += $registro['aprobados'];
                 $total_reprobados += $registro['reprobados'];
                 $total_vigentes += $registro['vigentes'];
-                $total_nota += $registro['pps'];
-                $total_periodos++;
             }
 
-            // Calcular el PPA
-            $PPA = $total_periodos > 0 ? $total_nota / $total_periodos : 0;
+            // Calcular el PPA solo con periodos válidos (PPS > 0)
+            $PPA = $total_periodos_validos > 0 ? $total_nota / $total_periodos_validos : 0;
 
             // Verificar estado del estudiante
             $estado_estudiante = $total_vigentes > 0 ? 'Vigente' : 'No vigente';

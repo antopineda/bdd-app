@@ -218,6 +218,8 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
             $es_valido = false;
         }
 
+
+
         // Si no es válido, guardarlo en el archivo de errores
         if (!$es_valido) {
             $array_errores[] = $linea;
@@ -299,14 +301,6 @@ function validar_y_corregir_datos_estudiante($array_datos, $posicion_rut, $nombr
             } else {
                 $linea_corregida[11] = trim($linea[11]);
             }
-
-            // $logro = $linea[12]; #es 1 ANO
-            // if (preg_match('/(\d+)\s*AÑO/i', $logro, $matches)) {
-            //     $anio = (int)$matches[1];
-            //     $semestre_corregido = $anio * 2; // Convertir años a semestres
-            //     $linea_corregida[12] = $semestre_corregido . " semestre";
-            // }
-
 
             // Agregar la línea corregida al archivo corregido
             $array_corregidos[] = $linea_corregida;
