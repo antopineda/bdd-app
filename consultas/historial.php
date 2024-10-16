@@ -9,12 +9,14 @@
         // Obtener el número de alumno desde el formulario
         $num_alumno = $_POST['num_alumno'];
 
+        echo "<h2>Historial del estudiante</h2>";
+
         // Consulta SQL
         $query = "
             SELECT h.periodo, h.codigo_asignatura, h.nota, h.calificacion,
                    COUNT(CASE WHEN h.nota >= 4.0 THEN 1 END) OVER (PARTITION BY h.periodo) AS aprobados,
                    COUNT(CASE WHEN h.nota < 4.0 THEN 1 END) OVER (PARTITION BY h.periodo) AS reprobados,
-                   COUNT(CASE WHEN h.periodo = '2024-2' THEN 1 END) OVER (PARTITION BY h.periodo) AS vigentes,
+                   COUNT(CASE WHEN h.periodo = '2024-02' THEN 1 END) OVER (PARTITION BY h.periodo) AS vigentes,
                    AVG(CASE WHEN h.nota IS NOT NULL THEN h.nota END) OVER (PARTITION BY h.periodo) AS pps
             FROM historial h
             WHERE h.num_alumno = :num_alumno

@@ -1,14 +1,14 @@
 <?php
-// Inicia sesión
+// Iniciar la sesión
 session_start();
 
-// Verifica si el usuario tiene acceso
+// Verificar si el usuario tiene acceso
 if (!isset($_SESSION['user']) || $_SESSION['role'] !== 'user') {
     header("Location: ../index.php");
     exit();
 }
 
-// Conecta a la base de datos
+// Conectar a la base de datos
 require('../config/conexion.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -16,19 +16,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Consulta SQL que obtiene el porcentaje de aprobación por profesor
     $sql = "
-        SELECT p.nombre AS profesor,
+        SELECT o.profesor_nombre AS profesor,
                COUNT(CASE WHEN h.nota >= 4.0 THEN 1 END) * 100.0 / COUNT(*) AS porcentaje_aprobacion
         FROM historial h
-        JOIN cursos_profesores cp ON h.codigo_asignatura = cp.codigo_curso
-        JOIN profesores p ON cp.run_profesor = p.run
+        JOIN oferta o ON h.codigo_asignatura = o.codigo_asignatura
         WHERE h.codigo_asignatura = :codigo_curso
-        GROUP BY p.nombre
+        GROUP BY o.profesor_nombre
         ORDER BY porcentaje_aprobacion DESC
     ";
 
     // Preparar y ejecutar la consulta
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['codigo_curso' => $codigo_curso]);
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam(':codigo_curso', $codigo_curso, PDO::PARAM_STR);
+    $stmt->execute();
     $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Mostrar los resultados

@@ -17,12 +17,15 @@ try {
         CASE 
             WHEN 
                 (
+                    -- Calcular los semestres transcurridos desde la cohorte
                     (EXTRACT(YEAR FROM to_date(e.cohorte, 'YYYY-MM')) - 2024) * -2 + 
                     CASE 
+                        -- Si la cohorte es del primer semestre (01), sumamos 1
                         WHEN SUBSTRING(e.cohorte, 6, 2) = '01' THEN 1 
-                        ELSE 0 
+                        ELSE 0 -- Si es del segundo semestre (02), no sumamos nada
                     END
                 ) = 
+                -- Extraer el número de semestre de la columna 'logro' solo si es un número
                 CASE 
                     WHEN POSITION(' ' IN e.logro) > 0 AND SUBSTRING(e.logro, 1, POSITION(' ' IN e.logro) - 1) ~ '^[0-9]+$'
                     THEN CAST(SUBSTRING(e.logro, 1, POSITION(' ' IN e.logro) - 1) AS INT)
@@ -35,11 +38,10 @@ try {
     FROM estudiantes e
     JOIN historial h ON e.run = h.run
     WHERE h.periodo = '2024-02'
+    -- Asegurarnos de que el logro comience con un número válido
     AND (POSITION(' ' IN e.logro) > 0 AND SUBSTRING(e.logro, 1, POSITION(' ' IN e.logro) - 1) ~ '^[0-9]+$')
-    GROUP BY estado_nivel
-    WITH ROLLUP;  -- Esta línea añade una fila adicional que resume los totales, si es útil.
-    ";
-
+    GROUP BY estado_nivel;
+";
     $result = $db->prepare($query);
     $result->execute();
     $reporte = $result->fetchAll(PDO::FETCH_ASSOC); 
