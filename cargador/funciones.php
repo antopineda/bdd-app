@@ -1095,14 +1095,14 @@ function crear_array_asinaturas($array){
     foreach ($array as $linea) {
         $plan = $linea[0];            
         $codigo = $linea[1];             
-        $ape = $linea[2];       
-        $email_institucional = $linea[3];  
+        $asignatura = $linea[2];       
+        $nivel = $linea[3];  
 
         $array_limpio[] = [
             $plan, 
-            $nombre, 
-            $apellido,
-            $email_institucional,
+            $codigo, 
+            $asignatura,
+            $nivel,
             
     ];     
     }
