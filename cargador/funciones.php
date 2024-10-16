@@ -871,7 +871,7 @@ function validar_y_corregir_datos_docentes($array_datos, $nombre_archivo_errores
 
         // Verificar y limpiar correo institucional (debe terminar en @lamejor.cl)
         $linea[5] = str_replace(' ', '', $linea[5]);
-        if (!isset($linea[5]) || empty($linea[5]) || substr($linea[5], -11) !== '@lamejor.cl') {
+        if (!isset($linea[5]) || empty($linea[5]) || !preg_match('/@lamejor\.(cl|com)$/', $linea[5])) {
             $es_valido = false;
         }
 
@@ -928,7 +928,7 @@ function validar_y_corregir_datos_docentes($array_datos, $nombre_archivo_errores
 
             // Verificar y limpiar correo institucional (debe terminar en @lamejor.cl)
             $linea[5] = str_replace(' ', '', $linea[5]);
-            if ($linea[5] !== '' && substr($linea[5], -11) !== '@lamejor.cl') {
+            if ($linea[5] !== '' && !preg_match('/@lamejor\.(cl|com)$/', $linea[5])) {
                 $linea_corregida[5] = 'x';
             }
 
@@ -1223,13 +1223,13 @@ function crear_array_oferta($array) {
 // #imprimir_bonito($array_datos_1);
 // echo "cantidad de datos en array limpio asinaturas", count($asignaturas_validos);
 
-// $array_datos_3 = abrir_archivo($ruta_planes);
-// echo "cantidad de datos en array original", count($array_datos_3);
-// echo "\n";
+$array_datos_3 = abrir_archivo($ruta_planes);
+echo "cantidad de datos en array original PLANES", count($array_datos_3);
+echo "\n";
 
-// $planes_validos = validar_y_corregir_datos_planes($array_datos_3, "planes_invalidos.csv", "planes_corregidos.csv");
-// #imprimir_bonito($array_datos_1);
-// echo "cantidad de datos en array limpio", count($planes_validos);
+$planes_validos = validar_y_corregir_datos_planes($array_datos_3, "planes_invalidos.csv", "planes_corregidos.csv");
+#imprimir_bonito($array_datos_1);
+echo "cantidad de datos en array limpio PLANES", count($planes_validos);
 
 // $array_datos_4 = abrir_archivo($ruta_prerrequisitos);
 // echo "cantidad de datos en array original", count($array_datos_4);
@@ -1239,13 +1239,13 @@ function crear_array_oferta($array) {
 // #imprimir_bonito($prerrequisitos_validos);
 // echo "cantidad de datos en array limpio", count($prerrequisitos_validos);
 
-$array_datos_5 = abrir_archivo($ruta_notas);
-echo "\ncantidad de datos en array original NOTAS ", count($array_datos_5);
-echo "\n";
+// $array_datos_5 = abrir_archivo($ruta_notas);
+// echo "\ncantidad de datos en array original NOTAS ", count($array_datos_5);
+// echo "\n";
 
-$notas_validos = validar_y_corregir_datos_notas($array_datos_5, "notas_invalidos.csv", "notas_corregidos.csv");
-#imprimir_bonito($notas_validos);
-echo "\ncantidad de datos en array limpio NOTAS ", count($notas_validos);
+// $notas_validos = validar_y_corregir_datos_notas($array_datos_5, "notas_invalidos.csv", "notas_corregidos.csv");
+// #imprimir_bonito($notas_validos);
+// echo "\ncantidad de datos en array limpio NOTAS ", count($notas_validos);
 
 // $array_datos_6 = abrir_archivo($ruta_planeacion);
 // echo "\ncantidad de datos en array original", count($array_datos_6);
