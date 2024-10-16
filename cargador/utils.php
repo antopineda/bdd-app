@@ -24,23 +24,23 @@ function insertar_en_tabla($database, $tabla, $fila){
 
         // Obtener el mensaje de error
         $errorMessage = $e->getMessage();
-        // echo "Error al insertar en la tabla $tabla: ";
-        // print_r($fila);
-        // echo "\nMensaje de error: $errorMessage\n";
+        echo "Error al insertar en la tabla $tabla: ";
+        print_r($fila);
+        echo "\nMensaje de error: $errorMessage\n";
 
-        // Manejo de errores específicos, como clave primaria duplicada
-        // if (strpos($errorMessage, 'Duplicate entry') !== false || strpos($errorMessage, 'Unique violation') !== false) {
-        //     // Detecta si el error es por una clave primaria o única duplicada
-        //     echo "Advertencia: La fila contiene una tupla duplicada y no fue insertada.\n";
-        // } 
-        // elseif (strpos($errorMessage, 'Data too long') !== false) {
-        //     guardar_error_en_archivo('errores_valores_largos.csv', $fila);
-        // } 
+        //Manejo de errores específicos, como clave primaria duplicada
+        if (strpos($errorMessage, 'Duplicate entry') !== false || strpos($errorMessage, 'Unique violation') !== false) {
+            // Detecta si el error es por una clave primaria o única duplicada
+            echo "Advertencia: La fila contiene una tupla duplicada y no fue insertada.\n";
+        } 
+        elseif (strpos($errorMessage, 'Data too long') !== false) {
+            guardar_error_en_archivo('errores_valores_largos.csv', $fila);
+        } 
         
-        // else {
-        //     // Otros errores
-        //     echo "Error general al insertar en la tabla $tabla: " . $e->getMessage() . "\n";
-        // }
+        else {
+            // Otros errores
+            echo "Error general al insertar en la tabla $tabla: " . $e->getMessage() . "\n";
+        }
     } 
 
 

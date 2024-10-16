@@ -29,7 +29,22 @@
     // } catch (Exception $e) {
     //     echo "Error al cargar datos: " . $e->getMessage();
     // }
-
+    try {
+        echo "INICIO DE INSERCIÓN DE DATOS OFERTA\n";
+        $array_planeacion = abrir_archivo($path_tablas['planeacion']);
+        $corregidos_planeacion = validar_y_corregir_datos_planeacion($array_planeacion, 'planeacion_invalidos.csv', 'planeacion_corregidos.csv');
+        $oferta = crear_array_oferta($corregidos_planeacion);
+        foreach ($oferta as $fila) {
+            insertar_en_tabla($db, 'oferta', $fila);
+        
+        # Liberar memoria
+        unset($array_planeacion);
+        unset($corregidos_planeacion);
+        unset($oferta);
+    }
+    } catch (Exception $e) {
+        echo "Error al cargar oferta: " . $e->getMessage();
+    }
     try {
         echo "INICIO DE INSERCIÓN DE DATOS USUARIOS\n";
         
@@ -138,22 +153,7 @@
         echo "Error al cargar academicos/admin: " . $e->getMessage();
     }
 
-    try {
-        echo "INICIO DE INSERCIÓN DE DATOS OFERTA\n";
-        $array_planeacion = abrir_archivo($path_tablas['planeacion']);
-        $corregidos_planeacion = validar_y_corregir_datos_planeacion($array_planeacion, 'planeacion_invalidos.csv', 'planeacion_corregidos.csv');
-        $oferta = crear_array_oferta($corregidos_planeacion);
-        foreach ($oferta as $fila) {
-            insertar_en_tabla($db, 'oferta', $fila);
-        
-        # Liberar memoria
-        unset($array_planeacion);
-        unset($corregidos_planeacion);
-        unset($oferta);
-    }
-    } catch (Exception $e) {
-        echo "Error al cargar oferta: " . $e->getMessage();
-    }
+
 
     // try {
     //     echo "INICIO DE INSERCIÓN DE DATOS HISTORIAL\n";

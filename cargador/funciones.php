@@ -805,6 +805,16 @@ function validar_y_corregir_datos_planeacion($array_datos, $nombre_archivo_error
             }
         }
 
+        // Verificar el RUT
+        if (isset($linea[20])) {
+            $rut = trim($linea[20]);
+            if (empty($rut) || !ctype_digit($rut) || strlen($rut) > 8) {
+                $es_valido = false;
+            } 
+        } else {
+            $es_valido = false;
+        }
+
         // Validar y corregir Nombre (solo letras y espacios, no nulo)
         if (!isset($linea[23]) || empty($linea[23]) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $linea[23])) {
             $es_valido = false;
@@ -817,11 +827,21 @@ function validar_y_corregir_datos_planeacion($array_datos, $nombre_archivo_error
         // Si no es válido, guardarlo en el archivo de errores
         if (!$es_valido) {
             $array_errores[] = $linea;
+            $linea_corregida = $linea;
             if (empty(implode('', $linea))) {
                 // Si la línea está completamente vacía, se guarda en el array de invalido
                 $array_invalido[] = $linea;
                 continue; // Omitir el procesamiento de esta línea
             }
+
+            // Corregir RUT
+            $rut = trim($linea[20]);
+            if (!isset($rut) || !ctype_digit($rut) || strlen($rut) > 8) {
+                $linea_corregida[20] = 'x';
+            } else {
+                $linea_corregida[20] = trim($rut);
+            }
+
             // Verificar cada celda de la línea para comprobar si está vacía
             foreach ($linea as $indice => $celda) {
                 if (!isset($celda) || trim($celda) === '') {
@@ -831,7 +851,7 @@ function validar_y_corregir_datos_planeacion($array_datos, $nombre_archivo_error
             }
 
             // Corregir atributos inválidos si es posible
-            $linea_corregida = $linea;
+            
 
             // Corregir nombres y apellidos
             if (!preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/u', trim($linea[23]))) {
@@ -970,9 +990,10 @@ function validar_y_corregir_datos_docentes($array_datos, $nombre_archivo_errores
             }
 
             if ($linea[6] > 40) {
-                $linea_corregida = 40;
+                $linea_corregida[6] = 40;
+                
             } elseif ($linea[6] < 0) {
-                $linea_corregida = 0;
+                $linea_corregida[6] = 0;
             }
 
             // Limpiar teléfono (solo 9 dígitos)
