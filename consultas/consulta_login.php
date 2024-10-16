@@ -24,6 +24,15 @@ if ($user && password_verify($password, $user['password'])){ // Esta comparació
     exit();
 } else {
     echo "Correo electrónico o contraseña incorrectos.";
+    echo "<br>";
+    echo "<a href='../index.php'>Volver</a>";
+    echo "<br>";
+    if (!$user) {
+        echo "El usuario no existe.";
+    } else {
+        echo "La contraseña es incorrecta.";
+        echo " usuario: {$user['email']}, password: {$user['password']}";
+        echo " password: $password";
+    }
 }
-
 ?>

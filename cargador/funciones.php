@@ -1,5 +1,5 @@
 <?php
-ini_set('memory_limit', '3G');  
+ini_set('memory_limit', '1G');  
 
 // $base_path = __DIR__ . '/../data/';
 
@@ -27,6 +27,48 @@ function abrir_archivo($ruta) {
     fclose($archivo_datos_1);
     return $array_datos_1;
 }
+
+function abrir_archivo_notas($ruta, $indice_inicio) {
+    // Abrir el archivo en modo lectura
+    $archivo = fopen($ruta, 'r');
+
+    // Verificar si el archivo se abrió correctamente
+    if ($archivo === false) {
+        throw new Exception("No se pudo abrir el archivo: $ruta");
+    }
+
+    $contador = 0; // Contador para avanzar hasta el índice de inicio
+    $lote = [];    // Array que almacenará el lote de notas
+    $tamaño_lote = 1000; // Tamaño del lote a leer
+
+    // Saltar la primera línea (encabezado) si la tiene
+    if ($indice_inicio === 0){
+        fgets($archivo);
+    }
+
+    // Saltar hasta el índice de inicio
+    while ($contador < $indice_inicio && !feof($archivo)) {
+        fgets($archivo); // Leer y descartar hasta llegar al índice de inicio
+        $contador++;
+    }
+
+    // Leer el archivo desde el índice especificado y separar por ";"
+    while (!feof($archivo) && count($lote) < $tamaño_lote) {
+        $linea = fgets($archivo);
+        $linea = rtrim($linea); // Eliminar el salto de línea y espacios al final
+
+        if (!empty($linea)) { // Verificar que la línea no esté vacía
+            $lote[] = explode(";", $linea); // Separar por ';' y añadir al lote
+        }
+    }
+
+    // Cerrar el archivo
+    fclose($archivo);
+
+    // Retornar el lote de datos
+    return $lote;
+}
+
 
 
 function imprimir_bonito($array_de_arrays) {
@@ -606,17 +648,18 @@ function validar_y_corregir_datos_notas($array_datos, $nombre_archivo_errores, $
         }
 
         # nota
+        $nota = trim($linea[15]); 
+        
         if (isset($linea[15])) {
-            $nota = trim($linea[15]);
             // Intentar convertir a decimal
             if (is_numeric($nota)) {
                 $linea[15] = floatval($nota);  // Convertir el valor a tipo float si es numérico
             }
-            if (!is_numeric($nota) || floatval($nota) < 1 || floatval($nota) > 7) {
-                $es_valido = false;
-            }
         }
 
+        if (!isset($linea[15])|| !is_numeric($nota) || floatval($nota) < 1 || floatval($nota) > 7 || is_null($nota) || $nota == '') {
+            $es_valido = false;
+        }
 
         // Si no es válido, guardarlo en el archivo de errores
         if (!$es_valido) {
@@ -731,7 +774,7 @@ function validar_y_corregir_datos_notas($array_datos, $nombre_archivo_errores, $
             
             // Intentar convertir a decimal
             if (is_numeric($valor)) {
-                $linea_corregida[15] = (float)$valor;  // Convertir el valor a tipo float si es numérico
+                $linea_corregida[15] = floatval($valor);  // Convertir el valor a tipo float si es numérico
             }
             
             // Agregar la línea corregida al archivo corregido
@@ -881,7 +924,7 @@ function validar_y_corregir_datos_docentes($array_datos, $nombre_archivo_errores
         }
 
         // Dedicación: Solo números
-        if (!isset($linea[6]) || empty($linea[6]) || !preg_match('/^\d+$/', $linea[6])) {
+        if (!isset($linea[6]) || empty($linea[6]) || !preg_match('/^\d+$/', $linea[6]) || $linea[6] > 40 || $linea[6] < 0) {
             $es_valido = false;
         }
 
@@ -932,6 +975,12 @@ function validar_y_corregir_datos_docentes($array_datos, $nombre_archivo_errores
                 $linea_corregida[5] = 'x';
             }
 
+            if ($linea[6] > 40) {
+                $linea_corregida = 40;
+            } elseif ($linea[6] < 0) {
+                $linea_corregida = 0;
+            }
+
             // Limpiar teléfono (solo 9 dígitos)
             if ($linea[7] !== '' && !preg_match('/^\d{9}$/', $linea[7])) {
                 $linea_corregida[3] = 'x';
@@ -966,11 +1015,12 @@ function validar_y_corregir_datos_docentes($array_datos, $nombre_archivo_errores
             if ($linea[0] !== 'x') {
                 $array_corregidos[] = $linea_corregida;
                 $array_validos[] = $linea_corregida;
-                if (preg_match('/\b(academico|académico)\b/i', $linea[15])) {
+                if (preg_match('/\b(academico|académico)\b/i', $linea_corregida[15])) {
                     $array_academicos[] = $linea_corregida;
+                    echo "Xenofilus";
                 }
                 // Verificamos si la posición 15 contiene "administrativo"
-                if (preg_match('/\b(administrativo)\b/i', $linea[15])) {
+                if (preg_match('/\b(administrativo)\b/i', $linea_corregida[15])) {
                     $array_administrativos[] = $linea_corregida;
                 }
 
@@ -982,17 +1032,35 @@ function validar_y_corregir_datos_docentes($array_datos, $nombre_archivo_errores
 
             }
 
-
         } else {
+
+            $linea_corregida = $linea;
+
             // Si es válido, agregar a la lista de válidos
-            $array_validos[] = $linea;
-            if (preg_match('/\b(academico|académico)\b/i', $linea[15])) {
+
+            # ponemos academico o administrrativo si tiene jerarquia o cargo respectivamente
+            if (trim($linea[13]) !== '') {
+                $linea_corregida[15] = "academico";
+            }
+
+            if (trim($linea[14]) !== '') {
+                $linea_corregida[15] = "administrativo";
+            }
+
+            if (trim($linea[14]) !== '' && trim($linea[13]) !== ''){
+                $linea_corregida[15] = "academico y administrativo";
+            }
+
+            if (preg_match('/\b(academico|académico)\b/i', $linea_corregida[15])) {
                 $array_academicos[] = $linea_corregida;
             }
             // Verificamos si la posición 15 contiene "administrativo"
-            if (preg_match('/\b(administrativo)\b/i', $linea[15])) {
+            if (preg_match('/\b(administrativo)\b/i', $linea_corregida[15])) {
                 $array_administrativos[] = $linea_corregida;
             }
+
+            $array_validos[] = $linea_corregida;
+
             // Clasificar en académicos y administrativos
             
         }
@@ -1161,7 +1229,8 @@ function crear_array_oferta($array) {
         $sede = $linea[1];        
         $factultad = $linea[2];             
         $codigo_depto = $linea[3];       
-        $codigo_asignatura = $linea[5];        
+        $codigo_asignatura = $linea[5];  
+        $nombre_asignatura = $linea[6];      
         $seccion = $linea[7];  
         $duracion = $linea[8]; 
         $vacantes = $linea[10];
@@ -1184,6 +1253,7 @@ function crear_array_oferta($array) {
             $factultad,          // 2
             $codigo_depto,       // 3
             $codigo_asignatura,  // 6
+            $nombre_asignatura,  // 7
             $seccion,            // 8
             $duracion,           // 9
             $vacantes,           // 11
@@ -1256,16 +1326,22 @@ function crear_array_oferta($array) {
 // echo "\n";
 
 // $planeacion_validos = validar_y_corregir_datos_planeacion($array_datos_6, "planeacion_invalidos.csv", "planeacion_corregidos.csv");
-// #imprimir_bonito($prerrequisitos_validos);
-// echo "cantidad de datos en array limpio", count($planeacion_validos);
+// // imprimir_bonito($planeacion_validos);
+// // echo "cantidad de datos en array limpio", count($planeacion_validos);
+
+// $oferta = crear_array_oferta($planeacion_validos);
+// imprimir_bonito($oferta);
+// echo "cantidad de datos en array limpio", count($oferta);
+
 
 // $array_datos_7 = abrir_archivo($ruta_docentes);
 // echo "cantidad de datos en array original", count($array_datos_7);
 // echo "\n";
 
 // $docentes_validos = validar_y_corregir_datos_docentes($array_datos_7, "docentes_invalidos.csv", "docentes_corregidos.csv");
-// #imprimir_bonito($docentes_validos["academicos"]);
-// echo "cantidad de datos en array limpio", count($docentes_validos["academicos"]);
+
+// imprimir_bonito($docentes_validos["administrativos"]);
+// echo "cantidad de datos en array limpio", count($docentes_validos["administrativos"]);
 
 // $array_administrativo = crear_array_administrativos($corregidos_docente["administrativos"]);
 

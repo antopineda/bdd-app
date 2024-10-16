@@ -39,6 +39,8 @@
             $header = fgetcsv($file); // Saltar la primera línea (encabezados)
             // Leer la única línea de datos
             $data = fgetcsv($file, 0, ',');
+            $hashedPassword = password_hash($data[1], PASSWORD_DEFAULT);
+            $data[1] = $hashedPassword;
             insertar_en_tabla($db, 'usuarios', $data);
             fclose($file);
         } else {
@@ -55,10 +57,15 @@
         $est = crear_array_estudiantes($corregidos_est);
         foreach ($est as $fila) {
             insertar_en_tabla($db, 'estudiantes', $fila);
+        # Liberar memoria
+        unset($array_estudiantes);
+        unset($corregidos_est);
+        unset($est);
     }
     } catch (Exception $e) {
         echo "Error al cargar estudiantes: " . $e->getMessage();
     }
+
 
     try {
         echo "INICIO DE INSERCIÓN DE DATOS ASIGNATURAS\n";
@@ -67,6 +74,10 @@
         $asi = crear_array_asinaturas($corregidos_asig);
         foreach ($asi as $fila) {
             insertar_en_tabla($db, 'asignaturas', $fila);
+        # Liberar memoria
+        unset($array_asignaturas);
+        unset($corregidos_asig);
+        unset($asi);
     }
     } catch (Exception $e) {
         echo "Error al cargar asignaturas: " . $e->getMessage();
@@ -79,6 +90,10 @@
         $planes = crear_array_planes($corregidos_plan);
         foreach ($planes as $fila) {
             insertar_en_tabla($db, 'planes', $fila);
+        # Liberar memoria
+        unset($array_plan);
+        unset($corregidos_plan);
+        unset($planes);
     }
     } catch (Exception $e) {
         echo "Error al cargar planes: " . $e->getMessage();
@@ -91,22 +106,13 @@
         $pre = crear_array_prerrequisitos($corregidos_prereq);
         foreach ($pre as $fila) {
             insertar_en_tabla($db, 'prerequisitos', $fila);
+        # Liberar memoria
+        unset($array_prereq);
+        unset($corregidos_prereq);
+        unset($pre);
     }
     } catch (Exception $e) {
         echo "Error al cargar prerequisitos: " . $e->getMessage();
-    }
-
-    try {
-        echo "INICIO DE INSERCIÓN DE DATOS HISTORIAL\n";
-        $array_notas = abrir_archivo($path_tablas['notas']);
-        $corregidos_notas = validar_y_corregir_datos_notas($array_notas, 'notas_invalidos.csv', 'notas_corregidos.csv');
-        $historial = crear_array_historial($corregidos_notas);
-
-        foreach ($historial as $fila) {
-            insertar_en_tabla($db, 'historial', $fila);
-    }
-    } catch (Exception $e) {
-        echo "Error al cargar historial: " . $e->getMessage();
     }
 
     try {
@@ -123,6 +129,11 @@
         foreach ($array_administrativo as $fila) {
             insertar_en_tabla($db, 'administrativo', $fila);
         }
+        # Liberar memoria
+        unset($array_docentes);
+        unset($corregidos_docente);
+        unset($array_academico);
+        unset($array_administrativo);
     } catch (Exception $e) {
         echo "Error al cargar academicos/admin: " . $e->getMessage();
     }
@@ -134,9 +145,60 @@
         $oferta = crear_array_oferta($corregidos_planeacion);
         foreach ($oferta as $fila) {
             insertar_en_tabla($db, 'oferta', $fila);
+        
+        # Liberar memoria
+        unset($array_planeacion);
+        unset($corregidos_planeacion);
+        unset($oferta);
     }
     } catch (Exception $e) {
         echo "Error al cargar oferta: " . $e->getMessage();
     }
+
+    // try {
+    //     echo "INICIO DE INSERCIÓN DE DATOS HISTORIAL\n";
+    //     $array_notas = abrir_archivo($path_tablas['notas']);
+    //     $corregidos_notas = validar_y_corregir_datos_notas($array_notas, 'notas_invalidos.csv', 'notas_corregidos.csv');
+    //     $historial = crear_array_historial($corregidos_notas);
+
+    //     foreach ($historial as $fila) {
+    //         insertar_en_tabla($db, 'historial', $fila);
+        
+    //     # Liberar memoria
+    //     unset($array_notas);
+    //     unset($corregidos_notas);
+    //     unset($historial);
+    // }
+    // } catch (Exception $e) {
+    //     echo "Error al cargar historial: " . $e->getMessage();
+    // }
+
+    try {
+        echo "INICIO DE INSERCIÓN DE DATOS HISTORIAL\n";
+        // Total de iteraciones a realizar
+        $total_iteraciones = 604; 
+        // Tamaño del lote a leer
+        $tamaño_lote = 1000; 
+        // Iterar 604 veces
+        for ($indice_inicio = 0; $indice_inicio < $total_iteraciones; $indice_inicio++) {
+            // Calcular el índice de inicio para la lectura
+            $indice_inicio_lectura = $indice_inicio * $tamaño_lote;
+            // Leer los datos desde el archivo en lotes de 1000
+            $array_notas = abrir_archivo_notas($path_tablas['notas'], $indice_inicio_lectura);
+            
+            // Validar y corregir los datos
+            $corregidos_notas = validar_y_corregir_datos_notas($array_notas, 'notas_invalidos.csv', 'notas_corregidos.csv');
+            $historial = crear_array_historial($corregidos_notas);
+    
+            // Insertar cada fila en la tabla 'historial'
+            foreach ($historial as $fila) {
+                insertar_en_tabla($db, 'historial', $fila);
+            }
+        }
+        
+    } catch (Exception $e) {
+        echo "Error al cargar historial poblar : " . $e->getMessage();
+    }
+    
 
 ?> 

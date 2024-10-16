@@ -1,46 +1,50 @@
-<?php
+<?php include('../templates/header.html'); ?>
 
-include '../config/conexion.php';
+<body>
+    <?php
+    require("../config/conexion.php");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Obtiene el periodo de la entrada del usuario
     $periodo = $_POST['periodo'];
-    $sql = "SELECT codigo_curso, nombre_profesor, porcentaje_aprobacion 
-            FROM aprobacion 
-            WHERE periodo = ?";
- 
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("s", $periodo);
-        $stmt->execute();
-        $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
-            echo "<div class='user'>";
-            echo "<h2 class='title'>Reporte: Porcentaje de Aprobación</h2>";
-            echo "<table class='styled-table'>";
-            echo "<thead>";
-            echo "<tr><th>Código Curso</th><th>Nombre del Profesor</th><th>Porcentaje de Aprobación</th></tr>";
-            echo "</thead>";
-            echo "<tbody>";
-            while ($row = $result->fetch_assoc()) {
-                echo "<tr>";
-                echo "<td>" . htmlspecialchars($row['codigo_curso']) . "</td>";
-                echo "<td>" . htmlspecialchars($row['nombre_profesor']) . "</td>";
-                echo "<td>" . htmlspecialchars($row['porcentaje_aprobacion']) . "%</td>";
-                echo "</tr>";
-            }
-            echo "</tbody>";
-            echo "</table>";
-            echo "</div>"; 
-        } else {
-            echo "<div class='user'><p>No se encontraron resultados para el periodo ingresado.</p></div>";
+    echo "<h2>Porcentaje de aprobación por periodo</h2>";
+
+    // Consulta SQL
+    $query = "
+        SELECT 
+            o.asignatura_id AS codigo_curso, 
+            o.profesor_nombre, 
+            o.profesor_apellido,
+            COUNT(CASE WHEN h.nota >= 4.0 THEN 1 END) * 100.0 / NULLIF(COUNT(h.num_alumno), 0) AS porcentaje_aprobacion
+        FROM oferta o
+        LEFT JOIN historial h ON o.asignatura_id = h.codigo_asignatura AND h.periodo = :periodo
+        WHERE o.periodo = :periodo
+        GROUP BY o.asignatura_id, o.profesor_nombre, o.profesor_apellido
+        ORDER BY o.asignatura_id;
+    ";
+
+    $result = $db->prepare($query);
+    $result->execute(['periodo' => $periodo]);
+    $aprobacion = $result->fetchAll();
+
+    ?>
+
+    <table class="styled-table">
+        <tr>
+            <th>Código de Curso</th>
+            <th>Nombre del Profesor</th>
+            <th>Porcentaje de Aprobación</th>
+        </tr>
+        <?php
+        foreach ($aprobacion as $a) {
+            echo "<tr>
+                    <td>$a[codigo_curso]</td>
+                    <td>$a[profesor_nombre] $a[profesor_apellido]</td>
+                    <td>" . round($a['porcentaje_aprobacion'], 2) . "%</td>
+                  </tr>";
         }
+        ?>
+    </table>
+</body>
 
-        $stmt->close();
-    } else {
-        echo "<div class='user'><p>Error en la consulta: " . $conn->error . "</p></div>";
-    }
-}
-
-// Cerrar la conexión
-$conn->close();
-?>
+<?php include('../templates/footer.html'); ?>
