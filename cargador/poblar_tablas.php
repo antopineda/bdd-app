@@ -35,7 +35,7 @@
         echo "INICIO DE INSERCIÓN DE DATOS PLANEACIÓN\n";
         $array_planeacion = abrir_archivo($path_tablas['planeacion']);
         $corregidos_planeacion = validar_y_corregir_datos_planeacion($array_planeacion, 'planeacion_invalidos.csv', 'planeacion_corregidos.csv');
-        $oferta = crear_array_oferta($corregidos_planeacion);
+        $oferta = crear_array_planeacion($corregidos_planeacion);
         foreach ($oferta as $fila) {
             insertar_en_tabla($db, 'planeacion', $fila);
         

@@ -3,7 +3,7 @@ include('../config/conexion.php');
 
 function corregir_run($run) {
     $run = trim($run);
-    if (empty($run) || strlen($rut) < 7 || strlen($rut) > 9 || !ctype_digit($run)) {
+    if (empty($run) || strlen($run) < 7 || strlen($run) > 9 || !is_numeric($run)) {
         return NULL;
     }
     return $run;
@@ -30,16 +30,20 @@ function personas_from_estudiante($array) {
 }
 
 function personas_from_profesor($db_profes) {
-    // Obtener datos de db_profes
-    $query = "SELECT run, nombre, apellido, email, telefono FROM profesores";
-    $result = pg_query($db_profes, $query);
-
+    // Consulta para obtener datos de profesores
+    $query = "SELECT run, nombre, apellido1, email_institucional, telefono FROM profesores";
+    
+    // Ejecutar la consulta
+    $stmt = $db_profes->query($query);
+    
     $array_limpio = [];
-    while ($linea = pg_fetch_assoc($result)) {
+    
+    while ($linea = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Aplicar la función corregir_run para el campo 'run'
         $run = corregir_run($linea['run']);
         $nombre = $linea['nombre'];
-        $apellido = $linea['apellido'];
-        $email = $linea['email'];
+        $apellido = $linea['apellido1'];
+        $email = $linea['email_institucional'];
         $telefono = $linea['telefono'];
         $estamento = 'profesor';
 
@@ -50,5 +54,6 @@ function personas_from_profesor($db_profes) {
 
     return $array_limpio;
 }
+
 
 ?>
