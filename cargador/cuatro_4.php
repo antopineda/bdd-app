@@ -1,5 +1,5 @@
-<!-- Para la Interfaz: -->
-<?php
+<!-- <?php
+// Para la Interfaz:
 $conn = new mysqli("localhost", "user", "password", "database");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -31,4 +31,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "Error: atributos o tablas no válidos.";
     }
 }
-?>
+?> -->

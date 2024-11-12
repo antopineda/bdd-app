@@ -1,13 +1,14 @@
 <?php 
 // 
 // Configuración de base de datos 
+include('../config/conexion.php');
 
-// $conn = new mysqli("localhost", "user", "password", "database"); 
-$conn = pg_connect("dbname=grupoXe3; host=localhost user=grupoXe3 password=<su contraseña de grupo>"); 
+// $db = new mysqli("localhost", "user", "password", "database"); 
+//$db = pg_dbect("dbname=grupo28e3; host=localhost user=grupo28e3 password=grupo28"); 
 
 // Inicia la transacción 
 
-$conn->begin_transaction(); 
+$db->begin_transaction(); 
 
 
 // Cargar el archivo CSV 
@@ -44,7 +45,7 @@ while (($row = fgetcsv($csvFile)) !== false) {
 
         echo "Error: nota de $numero_alumno contiene un valor erróneo. Corríjalo manualmente en el archivo de origen y vuelva a cargar."; 
 
-        $conn->rollback(); // Abortar transacción 
+        $db->rollback(); // Abortar transacción 
 
         exit; 
 
@@ -56,7 +57,7 @@ while (($row = fgetcsv($csvFile)) !== false) {
 
     $sql = "INSERT INTO acta (numero_alumno, curso, periodo, nota) VALUES (?, ?, ?, ?)"; 
 
-    $stmt = $conn->prepare($sql); 
+    $stmt = $db->prepare($sql); 
 
     $stmt->bind_param("issd", $numero_alumno, $curso, $periodo, $nota); 
 
@@ -68,7 +69,7 @@ while (($row = fgetcsv($csvFile)) !== false) {
 
 // Commit si todo está bien 
 
-$conn->commit(); 
+$db->commit(); 
 
 fclose($csvFile); 
 
