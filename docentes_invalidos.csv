@@ -1,4 +1,4 @@
-﻿RUN;Nombre;"Apellido P";telefono;emailpersonal;emailinstitucional;DEDICACIÓN;CONTRATO;DIURNO;VESPERTINO;SEDE;CARRERA;"GRADO ACADÉMICO";"JERARQUÍA ";CARGO;ESTAMENTO
+RUN;Nombre;"Apellido P";telefono;emailpersonal;emailinstitucional;DEDICACIÓN;CONTRATO;DIURNO;VESPERTINO;SEDE;CARRERA;"GRADO ACADÉMICO";"JERARQUÍA ";CARGO;ESTAMENTO
 ;;;;;;10;HONORARIO;;vespertino;;;0;;;Académico
 ;;;;;;40;"FULL TIME";diurno;;;;MAGISTER;;"Director (a) Centro de Sol. Colab.de C";Académico
 19156759;;;;;;40;"FULL TIME";;;;;;;"Secretaria (o)";Administrativo
@@ -30,7 +30,7 @@
 12684784-K;;;;;;40;;;;;;;;"Secretario (a) de Dirección";Administrativo
 ;;;;;;;HONORARIO;;;;;;"INSTRUCTOR DOCENTE";;
 ;;;;;;;HONORARIO;diurno;;;;"MAGISTER ";"INSTRUCTORA DOCENTE";;
-;"araya MARIN,  OLGA sonia";;;;;40;;;;;;;;Asistente;Administrativo
+;"""araya MARIN";"  OLGA sonia""";;;;;40;;;;;;;;Asistente;Administrativo
 19064170;Gilderoy;Lockhart;901234571;gilderoy.lockhart@yeeha.com;gilderoy.lockhart@lamejor.com;;HONORARIO;diurno;;BEAUXBATON;HECHICERÍA;"DOCTOR ";"ASISTENTE DOCENTE";;
 ;;;;;;;HONORARIO;diurno;;;;LICENCIATURA;"ASISTENTE DOCENTE";;
 ;;;;;;40;"FULL TIME";;;;;0;"TITULAR DOCENTE";"Académico Investigador";Académico

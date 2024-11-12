@@ -14,7 +14,7 @@
 17043066;Minerva;McGonagall;x;minerva.mcgonagall@gmall.com;minerva.mcgonagall@lamejor.com;0;HONORARIO;diurno;x;x;x;MAGISTER;"ASISTENTE DOCENTE";x;academico
 9866866;Luna;Lovegood;x;luna.lovegood.diaz@yeeha.com;luna.lovegood.diaz@lamejor.com;0;x;diurno;x;HOGWARTS;MAGIA;MAGISTER;"INSTRUCTOR DOCENTE";x;academico
 22073090;Dennis;Creevey;x;dennis.creevey.nash@gmall.com;dennis.creevey.nash@lamejor.com;0;x;x;x;x;x;MAGISTER;x;x;x
-7777777;"EDUARDO SANTIAGO";BUSTOS;x;eb@uc.cl;eb@lamejor.cl;80;x;"A VECES";TAMBIEN;HOGWARTS;x;x;BAJA;JUNIOR;"academico y administrativo"
+7777777;"EDUARDO SANTIAGO";BUSTOS;x;eb@uc.cl;eb@lamejor.cl;40;x;"A VECES";TAMBIEN;HOGWARTS;x;x;BAJA;JUNIOR;"academico y administrativo"
 13689982;Remus;Lupin;x;remus.lupin@coldmail.com;remus.lupin@lamejor.com;0;"FULL TIME";diurno;vespertino;HOGWARTS;MAGIA;MAGISTER;"ASOCIADO DOCENTE";"Profesor por Jornada";"academico y administrativo"
 8270690;Vincent;Crabbe;x;vincent.crabbe.piturra@gmall.com;vincent.crabbe.piturra@lamejor.com;0;HONORARIO;x;vespertino;HOGWARTS;MAGIA;MAGISTER;"ASISTENTE DOCENTE";x;academico
 15647936;x;x;x;x;x;0;HONORARIO;x;x;x;x;MAGISTER;"INSTRUCTOR DOCENTE";"Profesor por Jornada";"academico y administrativo"
@@ -67,7 +67,7 @@
 9909814;Hannah;Abbott;x;hannah.abbott@viana.com;x;0;HONORARIO;x;x;BEAUXBATON;HECHICERÍA;MAGISTER;"INSTRUCTOR DOCENTE";x;academico
 12712137;Katie;Bell;x;katie.bell.aguirre@coldmail.com;katie.bell.aguirre@lamejor.com;0;x;x;x;x;x;x;x;x;x
 14079731;Pomona;Sprout;x;pomona.sprout@coldmail.com;pomona.sprout@lamejor.com;0;x;x;x;x;x;x;x;x;x
-10778699;LAMAS;BELLA;x;lamas.bella.delmundo@yeeha.com;lamas.bella.delmundo@lamejor.com;120;"DOUBLE  TIME";diurno;vespertino;TODAS;HECHICERÍA;MAGISTER;"ASISTENTE DOCENTE";VICEDECANA;"academico y administrativo"
+10778699;LAMAS;BELLA;x;lamas.bella.delmundo@yeeha.com;lamas.bella.delmundo@lamejor.com;40;"DOUBLE  TIME";diurno;vespertino;TODAS;HECHICERÍA;MAGISTER;"ASISTENTE DOCENTE";VICEDECANA;"academico y administrativo"
 11682760;Amycus;Carrow;x;amycus.carrow@yeeha.com;amycus.carrow@lamejor.com;0;x;diurno;vespertino;x;x;x;x;x;x
 24496460;Parvati;Patil;x;parvati.patil.pardo@yeeha.com;parvati.patil.pardo@lamejor.com;0;HONORARIO;diurno;vespertino;HOGWARTS;MAGIA;LICENCIATURA;"ASOCIADO DOCENTE";x;academico
 19690944;Lavender;Brown;x;lavender.brown@torralbo.com;x;0;x;x;x;x;x;x;x;x;x
