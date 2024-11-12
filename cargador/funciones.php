@@ -1102,7 +1102,6 @@ function guardar_csv($array_datos, $nombre_archivo) {
     fclose($archivo);
 }
 
-
 ## funcion para hacer los array
 function crear_array_academicos($array) {
     $array_limpio = [];
