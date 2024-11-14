@@ -31,39 +31,48 @@
     // } catch (Exception $e) {
     //     echo "Error al cargar datos: " . $e->getMessage();
     // }
-    try {
-        echo "INICIO DE INSERCIÓN DE DATOS PLANEACIÓN\n";
-        $array_planeacion = abrir_archivo($path_tablas['planeacion']);
-        $corregidos_planeacion = validar_y_corregir_datos_planeacion($array_planeacion, 'planeacion_invalidos.csv', 'planeacion_corregidos.csv');
-        $oferta = crear_array_planeacion($corregidos_planeacion);
-        foreach ($oferta as $fila) {
-            insertar_en_tabla($db, 'planeacion', $fila);
+    // try {
+    //     echo "INICIO DE INSERCIÓN DE DATOS PLANEACIÓN\n";
+    //     $array_planeacion = abrir_archivo($path_tablas['planeacion']);
+    //     $corregidos_planeacion = validar_y_corregir_datos_planeacion($array_planeacion, 'planeacion_invalidos.csv', 'planeacion_corregidos.csv');
+    //     $oferta = crear_array_planeacion($corregidos_planeacion);
+    //     foreach ($oferta as $fila) {
+    //         insertar_en_tabla($db, 'planeacion', $fila);
         
-        # Liberar memoria
-        unset($array_planeacion);
-        unset($corregidos_planeacion);
-        unset($oferta);
-    }
-    } catch (Exception $e) {
-        echo "Error al cargar planeación: " . $e->getMessage();
-    }
+    //     # Liberar memoria
+    //     unset($array_planeacion);
+    //     unset($corregidos_planeacion);
+    //     unset($oferta);
+    // }
+    // } catch (Exception $e) {
+    //     echo "Error al cargar planeación: " . $e->getMessage();
+    // }
 
-    try {
-        echo "INICIO DE INSERCIÓN DE DATOS PERSONAS\n";
-        $array_personas = abrir_archivo($path_tablas['estudiantes']);
-        $estudiantes_personas = personas_from_estudiante($array_personas);
-        foreach ($estudiantes_personas as $fila) {
-            insertar_en_tabla($db, 'personas', $fila);
-        }
+    // try {
+    //     echo "INICIO DE INSERCIÓN DE DATOS PERSONAS\n";
+    //     $array_personas = abrir_archivo($path_tablas['estudiantes']);
+    //     $estudiantes_personas = personas_from_estudiante($array_personas);
+    //     foreach ($estudiantes_personas as $fila) {
+    //         insertar_en_tabla($db, 'personas', $fila);
+    //     }
 
-        $profes_personas = personas_from_profesor($db_profes);
-        foreach ($profes_personas as $fila) {
-            insertar_en_tabla($db, 'personas', $fila);
-        }
+    //     $profes_personas = personas_from_profesor($db_profes);
+    //     foreach ($profes_personas as $fila) {
+    //         insertar_en_tabla($db, 'personas', $fila);
+    //     }
         
-    } catch (Exception $e) {
-        echo "Error al cargar personas: " . $e->getMessage();
-    }
+    // } catch (Exception $e) {
+    //     echo "Error al cargar personas: " . $e->getMessage();
+    // }
+
+
+    // try {
+    //     echo "INICIO DE INSERCIÓN DE DATOS ADIVINACIÓN\n";
+    //     $array_adivinacion = abrir_archivo($path_tablas['adivinacion']);
+
+    // } catch (Exception $e) {
+    //     echo "Error al cargar adivinación: " . $e->getMessage();
+    // }
     
     // try {
     //     echo "INICIO DE INSERCIÓN DE DATOS USUARIOS\n";

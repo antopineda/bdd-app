@@ -14,6 +14,18 @@ include('templates/header.html');
   <h1 class="title">Bananer</h1>
   <p class="description">Aquí podrás hacer tus consultas.</p>
 
+  <h2 class="subtitle">Consulta A-T-C </h2>
+  <p class="prompt">Consulta SELECT A FROM T WHERE C (A: atributos, T: tabla, C: condición)</p>
+  <form class="form" action="consultas/E3/cuatro_4.php" method="post">
+    <input class="form-input" type="text" required placeholder="Ingresa los atributos" name="atributos"> 
+    <input class="form-input" type="text" required placeholder="Ingresa la tabla" name="tabla"> 
+    <input class="form-input" type="text" required placeholder="Ingresa la condición" name="condicion">
+    <br>
+    <input class="form-button" type="submit" value="Buscar">
+  </form>
+  <br>
+  <br>
+
   <h2 class="subtitle">Consultas</h2>
 
   <p class="prompt">Reporte: Cantidad de estudiantes vigentes dentro y fuera de nivel</p>

@@ -15,7 +15,7 @@ $query->bindParam(':email', $email);
 $query->execute();
 
 // Verificar si está en la tabla academico o administrativo
-$queryAcademico = $db->prepare("SELECT * FROM academico WHERE email_institucional = :email");
+$queryAcademico = $db->prepare("SELECT * FROM personas WHERE email = :email AND estamento = 'profesor'");
 $queryAcademico->bindParam(':email', $email);
 $queryAcademico->execute();
 
