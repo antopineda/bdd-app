@@ -10,7 +10,7 @@ include('templates/header.html');
 ?>
 
 <body>
-  <div class="user">
+  <div class="container">
   <h1 class="title">Bananer</h1>
   <p class="description">Aquí podrás hacer tus consultas.</p>
 
