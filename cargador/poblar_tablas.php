@@ -31,22 +31,22 @@
     // } catch (Exception $e) {
     //     echo "Error al cargar datos: " . $e->getMessage();
     // }
-    try {
-        echo "INICIO DE INSERCIÓN DE DATOS PLANEACIÓN\n";
-        $array_planeacion = abrir_archivo($path_tablas['planeacion']);
-        $corregidos_planeacion = validar_y_corregir_datos_planeacion($array_planeacion, 'planeacion_invalidos.csv', 'planeacion_corregidos.csv');
-        $oferta = crear_array_planeacion($corregidos_planeacion);
-        foreach ($oferta as $fila) {
-            insertar_en_tabla($db, 'planeacion', $fila);
+    // try {
+    //     echo "INICIO DE INSERCIÓN DE DATOS PLANEACIÓN\n";
+    //     $array_planeacion = abrir_archivo($path_tablas['planeacion']);
+    //     $corregidos_planeacion = validar_y_corregir_datos_planeacion($array_planeacion, 'planeacion_invalidos.csv', 'planeacion_corregidos.csv');
+    //     $oferta = crear_array_planeacion($corregidos_planeacion);
+    //     foreach ($oferta as $fila) {
+    //         insertar_en_tabla($db, 'planeacion', $fila);
         
-        # Liberar memoria
-        unset($array_planeacion);
-        unset($corregidos_planeacion);
-        unset($oferta);
-    }
-    } catch (Exception $e) {
-        echo "Error al cargar planeación: " . $e->getMessage();
-    }
+    //     # Liberar memoria
+    //     unset($array_planeacion);
+    //     unset($corregidos_planeacion);
+    //     unset($oferta);
+    // }
+    // } catch (Exception $e) {
+    //     //echo "Error al cargar planeación: " . $e->getMessage();
+    // }
 
     // try {
     //     echo "INICIO DE INSERCIÓN DE DATOS PERSONAS\n";
