@@ -51,12 +51,12 @@
                 END IF;
 
                 -- Validar que cada estudiante exista
-                IF EXISTS (
-                    SELECT 1
-                    FROM acta a
-                    WHERE NOT EXISTS (SELECT 1 FROM personas p WHERE p.run = a.run)
-                ) THEN
-                    RAISE EXCEPTION 'Existen estudiantes en el acta con RUN no válidos.';
+                SELECT STRING_AGG(a.run, ', ') INTO estudiantes_invalidos
+                FROM acta a
+                WHERE NOT EXISTS (SELECT 1 FROM personas p WHERE p.run = a.run);
+
+                IF estudiantes_invalidos IS NOT NULL THEN
+                    RAISE EXCEPTION 'Existen estudiantes en el acta con RUN no válidos: %', estudiantes_invalidos;
                 END IF;
                 
                 -- Validar que las notas estén en el rango correcto
