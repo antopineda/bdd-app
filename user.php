@@ -16,7 +16,7 @@ include('templates/header.html');
 
   <h2 class="subtitle">Consulta A-T-C </h2>
   <p class="prompt">Consulta SELECT A FROM T WHERE C (A: atributos, T: tabla, C: condición)</p>
-  <form class="form" action="consultas/E3/cuatro_4.php" method="post">
+  <form class="form" action="consultas/E3/consulta_atc.php" method="post">
     <input class="form-input" type="text" required placeholder="Ingresa los atributos" name="atributos"> 
     <input class="form-input" type="text" required placeholder="Ingresa la tabla" name="tabla"> 
     <input class="form-input" type="text" required placeholder="Ingresa la condición" name="condicion">
@@ -24,9 +24,15 @@ include('templates/header.html');
     <input class="form-button" type="submit" value="Buscar">
   </form>
   <br>
+
+  <h2 class="subtitle">Ver acta de notas Adivinación I </h2>
+  <form class="form" action="consultas/E3/cuatro_1.php" method="get">
+    <input class="form-button" type="submit" value="Ir a la página">
+  </form>
+  <br>
   <br>
 
-  <h2 class="subtitle">Consultas</h2>
+  <h2 class="subtitle">Consultas Anteriores</h2>
 
   <p class="prompt">Reporte: Cantidad de estudiantes vigentes dentro y fuera de nivel</p>
   <form class="form" action="consultas/estudiantes_vigentes.php" method="post">
