@@ -1,44 +1,44 @@
 <?php
 function createTrigger($db){
 
+    // Eliminar cualquier trigger existente con el mismo nombre
     $dropTriggerQuery = "DROP TRIGGER IF EXISTS trigger_calcular_calificacion_after_insert ON historial;";
     $db->exec($dropTriggerQuery);
 
+    // Crear el nuevo trigger y función
     $createTriggerQuery = "
-    DROP TRIGGER IF EXISTS trigger_calcular_calificacion_after_insert ON historial;
     DROP FUNCTION IF EXISTS calcular_calificacion_after_insert;
-    
+
     CREATE OR REPLACE FUNCTION calcular_calificacion_after_insert()
     RETURNS TRIGGER AS $$
     DECLARE
-        calificacion VARCHAR(10);
-        nota_final FLOAT;
+        new_cal VARCHAR(10);
+        nota FLOAT;
     BEGIN
-        -- Asumiendo que NEW.nota_final ya tiene el valor correcto de la nota final después de aplicar las reglas de negocio
-        nota_final := NEW.nota_final;
+        -- Asumiendo que NEW.nota ya tiene el valor correcto de la nota después de aplicar las reglas de negocio
+        nota := NEW.nota;
 
-        -- Cálculo de calificación basado en la nota final
+        -- Cálculo de calificación basado en la nota
         CASE
-            WHEN nota_final >= 6.6 AND nota_final <= 7.0 THEN calificacion := 'SO';
-            WHEN nota_final >= 6.0 AND nota_final < 6.6 THEN calificacion := 'MB';
-            WHEN nota_final >= 5.0 AND nota_final < 6.0 THEN calificacion := 'B';
-            WHEN nota_final >= 4.0 AND nota_final < 5.0 THEN calificacion := 'SU';
-            WHEN nota_final >= 3.0 AND nota_final < 4.0 THEN calificacion := 'I';
-            WHEN nota_final >= 2.0 AND nota_final < 3.0 THEN calificacion := 'M';
-            WHEN nota_final >= 1.0 AND nota_final < 2.0 THEN calificacion := 'MM';
-            WHEN nota_final IS NULL THEN calificacion := 'P';
-            WHEN nota_final = 'NP' THEN calificacion := 'NP';
-            WHEN nota_final = 'EX' THEN calificacion := 'A';
-            WHEN nota_final = 'A' THEN calificacion := 'A';
-            WHEN nota_final = 'R' THEN calificacion := 'R';
+            WHEN nota >= 6.6 AND nota <= 7.0 THEN new_cal := 'SO';
+            WHEN nota >= 6.0 AND nota < 6.6 THEN new_cal := 'MB';
+            WHEN nota >= 5.0 AND nota < 6.0 THEN new_cal := 'B';
+            WHEN nota >= 4.0 AND nota < 5.0 THEN new_cal := 'SU';
+            WHEN nota >= 3.0 AND nota < 4.0 THEN new_cal := 'I';
+            WHEN nota >= 2.0 AND nota < 3.0 THEN new_cal := 'M';
+            WHEN nota >= 1.0 AND nota < 2.0 THEN new_cal := 'MM';
+            WHEN nota IS NULL THEN new_cal := 'P';
+            WHEN nota = 'NP' THEN new_cal := 'NP';
+            WHEN nota = 'EX' THEN new_cal := 'A';
+            WHEN nota = 'A' THEN new_cal := 'A';
+            WHEN nota = 'R' THEN new_cal := 'R';
             ELSE
-                RAISE EXCEPTION 'Nota final no reconocida: %', nota_final;
+                RAISE EXCEPTION 'Nota no reconocida: %', nota;
         END CASE;
 
-        -- Actualizar la calificación en la tabla historial
         UPDATE historial
-        SET calificacion = $1.calificacion -- Aquí usamos $1 para referirnos a NEW
-        WHERE historial.num_alumno = NEW.numero_alumno AND historial.calificacion IS NULL;
+        SET calificacion = new_cal
+        WHERE historial.num_alumno = NEW.num_alumno AND historial.calificacion IS NULL;
 
         RETURN NEW;
     END;
