@@ -71,6 +71,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         foreach ($atributos as $atributo) {
             if (count(explode('.', $atributo)) > 1) {
                 list($tabla_alias, $atributo_sin_alias) = explode('.', $atributo);
+                $atributos_validos = obtenerAtributosValidos($db, $tabla_alias);
+                if ($atributo_sin_alias == "password") {
+                    mostrarError("Error: No se pueden seleccionar atributos de tipo 'password'.");
+                }
                 if (!in_array($tabla_alias, $tablas)) {
                     mostrarError("Error: La tabla alias '$tabla_alias' no es válida.");
                 }
@@ -88,6 +92,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
                 if ($atributo !== "*" && !$atributo_valido) {
                     mostrarError("Error: El atributo '$atributo' no es válido en ninguna de las tablas especificadas.");
+                } elseif ($atributo == "password") {
+                    mostrarError("Error: No se pueden seleccionar atributos de tipo 'password'.");
                 }
             }
         }

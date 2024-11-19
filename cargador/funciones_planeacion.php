@@ -19,10 +19,48 @@ function validar_y_corregir_datos_planeacion($array_datos, $nombre_archivo_error
         if (isset($linea[20])) {
             $rut = trim($linea[20]);
             if (empty($rut) || !ctype_digit($rut) || strlen($rut) > 9) {
-                $es_valido = false;
+                $linea[20] = 'x';
             } 
-        } else {
-            $es_valido = false;
+        }
+
+        // Verificar id_depto
+        if (isset($linea[3])) {
+            $id_depto = trim($linea[3]);
+            if (empty($id_depto) || !ctype_digit($id_depto) || strlen($id_depto) > 5) {
+                $linea[3] = '0';
+            } elseif (is_numeric($id_depto)) {
+                $linea[3] = (int) $id_depto;
+            }
+        }
+
+        // Verificar vacantes
+        if (isset($linea[10])) {
+            $vacantes = trim($linea[10]);
+            if (empty($vacantes) || !ctype_digit($vacantes) || strlen($vacantes) > 3) {
+                $linea[10] = '0';
+            } elseif (is_numeric($vacantes)) {
+                $linea[10] = (int) $vacantes;
+            }
+        }
+
+        // Verificar inscritos
+        if (isset($linea[11])) {
+            $inscritos = trim($linea[11]);
+            if (empty($inscritos) || !ctype_digit($inscritos) || strlen($inscritos) > 3) {
+                $linea[11] = '0';
+            } elseif (is_numeric($inscritos)) {
+                $linea[11] = (int) $inscritos;
+            }
+        }
+
+        // Verificar sección
+        if (isset($linea[7])) {
+            $seccion = trim($linea[7]);
+            if (empty($seccion) || !ctype_digit($seccion) || strlen($seccion) > 3) {
+                $linea[7] = '0';
+            } elseif (is_numeric($seccion)) {
+                $linea[7] = (int) $seccion;
+            }
         }
         
         // Si no es válido, guardarlo en el archivo de errores
@@ -30,17 +68,7 @@ function validar_y_corregir_datos_planeacion($array_datos, $nombre_archivo_error
             $array_errores[] = $linea;
             $linea_corregida = $linea;
             if (empty(implode('', $linea))) {
-                // Si la línea está completamente vacía, se guarda en el array de invalido
-                $array_invalido[] = $linea;
-                continue; // Omitir el procesamiento de esta línea
-            }
-
-            // Corregir RUT
-            $rut = trim($linea[20]);
-            if (!isset($rut) || !ctype_digit($rut) || strlen($rut) > 9) {
-                $linea_corregida[20] = 'x';
-            } else {
-                $linea_corregida[20] = trim($rut);
+                continue; // Omitir esta línea
             }
 
             // Verificar cada celda de la línea para comprobar si está vacía
@@ -51,9 +79,6 @@ function validar_y_corregir_datos_planeacion($array_datos, $nombre_archivo_error
                 }
             }
 
-            // Corregir atributos inválidos si es posible
-            
-
             // Agregar la línea corregida al archivo corregido
             $array_corregidos[] = $linea_corregida;
             $array_validos[] = $linea_corregida;
@@ -63,10 +88,6 @@ function validar_y_corregir_datos_planeacion($array_datos, $nombre_archivo_error
             $array_validos[] = $linea;
         }
     }
-
-    // Guardar los errores y los corregidos en archivos CSV
-    guardar_csv($array_errores, $nombre_archivo_errores);
-    guardar_csv($array_corregidos, $nombre_archivo_corregidos);
 
     // Retornar los datos válidos
     return $array_validos;
@@ -101,26 +122,26 @@ function crear_array_planeacion($array) {
 
         // Añadir una nueva línea al array limpio con los valores requeridos
         $array_limpio[] = [
-            $periodo,            // 0
-            $sede,               // 1
-            $factultad,          // 2
-            $codigo_depto,       // 3
-            $departamento,       // 4
-            $codigo_asignatura,  // 5
-            $nombre_asignatura,  // 6
-            $seccion,            // 7
-            $duracion,           // 8
-            $vacantes,           // 10
-            $inscritos,          // 11
-            $dia,                // 12
-            $hora_inicio,        // 13
-            $hora_fin,           // 14
-            $fecha_inicio,       // 15
-            $fecha_fin,          // 16
-            $lugar,              // 17
-            $edificio,           // 18
-            $profesor_principal, // 19
-            $profesor_run,          // 20
+            $periodo,
+            $sede,
+            $factultad,
+            $codigo_depto,
+            $departamento, 
+            $codigo_asignatura,
+            $nombre_asignatura,
+            $seccion,
+            $duracion,
+            $vacantes,
+            $inscritos,
+            $dia,
+            $hora_inicio,
+            $hora_fin,
+            $fecha_inicio,
+            $fecha_fin, 
+            $lugar,
+            $edificio,
+            $profesor_principal,
+            $profesor_run,
         ];
     }
 
